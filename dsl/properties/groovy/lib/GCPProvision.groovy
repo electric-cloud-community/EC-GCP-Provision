@@ -1,7 +1,8 @@
 import com.cloudbees.flowpdf.*
 import com.cloudbees.flow.plugins.*
-import groovy.json.JsonParser
 import groovy.json.JsonSlurper
+import com.electriccloud.client.groovy.models.ActualParameter
+
 
 /**
  * GCPProvision
@@ -168,7 +169,7 @@ class GCPProvision extends FlowPlugin {
         }
         String projectId = config.getRequiredParameter('projectId').value
         String zone = config.getRequiredParameter('zone')
-        GCP gcp = new GCP(key, projectId, zone)
+        GCP gcp = new GCP(key, projectId, zone, false)
         return gcp
     }()
 
@@ -191,24 +192,78 @@ class GCPProvision extends FlowPlugin {
 
         String resourceName = p.getRequiredParameter('resName').value
 
-        String createdBy = FlowAPI.getFlowProperty("/resources/$resourceName/ec_cloud_instance_details/createdBy")
-        log.info "The resource $resourceName is created by $createdBy"
-        String instanceName = FlowAPI.getFlowProperty("/resources/$resourceName/ec_cloud_instance_details/instance_id")
-        log.info "The instance id is $instanceName"
-        String config = FlowAPI.getFlowProperty("/resources/$resourceName/ec_cloud_instance_details/config")
-        log.info "The config name is $config"
-
-        if (createdBy != '@PLUGIN_KEY@') {
-            throw new RuntimeException("Cannot tear down the instance created by another plugin")
+        def resourcePool
+        def resources = []
+        try {
+            resourcePool = FlowAPI.ec.getResourcePool(resourcePoolName: resourceName)
+            log.info "Resource Pool: $resourcePool"
+            resourcePool?.resourcePool?.resourceNames?.resourceName?.each {
+                resources << it
+            }
+        } catch (Throwable e) {
+            log.info "Failed to get resource pool $resourceName"
+            log.info "${e.message}"
         }
 
-        if (config == p.getRequiredParameter('config').value) {
-            def operation = gcp.deleteInstance(instanceName)
-            gcp.blockUntilComplete(operation, 30 * 1000)
+        try {
+            def resource = FlowAPI.ec.getResource(resourceName: resourceName)
+            resources << resourceName
         }
-        else {
-            throw new RuntimeException("Not implemented yet")
-            // Launch procedure with the correct config
+        catch(Throwable e) {
+            log.info "Failed to get resource $resourceName"
+            log.info("${e.message}")
+            return
+        }
+
+        def configs = [:]
+        boolean hasErrors = false
+        for(String resName in resources) {
+            String createdBy = FlowAPI.getFlowProperty("/resources/$resName/ec_cloud_instance_details/createdBy")
+            log.info "The resource $resName is created by $createdBy"
+            String instanceName = FlowAPI.getFlowProperty("/resources/$resName/ec_cloud_instance_details/instance_id")
+            log.info "The instance id is $instanceName"
+            String config = FlowAPI.getFlowProperty("/resources/$resName/ec_cloud_instance_details/config")
+            log.info "The config name is $config"
+            if (createdBy == '@PLUGIN_KEY@') {
+                //def instances = configs.get(config, [])
+                //instances << instanceName
+                //configs.put(config, instances)
+
+                def result = FlowAPI.ec.runProcedure(
+                    procedureName: 'Delete Machine',
+                    projectName: '/plugins/@PLUGIN_KEY@/project',
+                    actualParameters: [
+                        new ActualParameter('config', config),
+                        new ActualParameter('instanceName', instanceName),
+                    ]
+                )
+                def jobId = result?.jobId
+                pollJob(jobId)
+                def status = FlowAPI.ec.getJobStatus(jobId: jobId)
+                def outcome = status?.outcome
+                if (outcome != 'error') {
+                    //Delete resource
+                    log.info "Job $jobId completed"
+                    FlowAPI.ec.deleteResource(resourceName: resName)
+                    log.info "Deleted resource $resName"
+                }
+                else {
+                    //fail
+                    hasErrors = true
+                    log.info "Failed to delete resource $resName: job $jobId has failed"
+                }
+            }
+        }
+
+    }
+
+    void pollJob(String jobId) {
+        log.info "Polling job $jobId"
+        def status = FlowAPI.ec.getJobStatus(jobId: jobId)?.status
+        while(status != 'completed') {
+            sleep(2 * 1000)
+            log.info "Polling job..."
+            status = FlowAPI.ec.getJobStatus(jobId: jobId)?.status
         }
     }
 
@@ -228,9 +283,20 @@ class GCPProvision extends FlowPlugin {
         )
 
         String instanceName = p.getRequiredParameter('instanceName').value
+        def instance
+        try {
+            instance = gcp.getInstance(instanceName)
+            log.info "Instance: $instance"
+        }
+        catch (Throwable e) {
+            log.info "$e.message"
+            log.info "Cannot get instance $instanceName: probably already deleted"
+            return
+        }
+
         def operation = gcp.deleteInstance(instanceName)
         log.info "Launched operation ${operation.getName()}"
-        gcp.blockUntilComplete(operation, 30 * 1000)
+        gcp.blockUntilComplete(operation, 60 * 1000)
     }
 
 // === step ends ===

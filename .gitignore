@@ -1,0 +1,4 @@
+build/*
+out/*
+GCPProvision/build/*
+GCPProvision/out/*

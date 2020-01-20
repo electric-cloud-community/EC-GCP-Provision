@@ -90,13 +90,14 @@ properties:
 procedures:
 
 - name: Teardown
-  description: Destroys a GCP machine
-  hasConfig: true
+  description: Deletes machines from the pool or the specified resource
+  hasConfig: false
   parameters:
     - name: resName
       required: true
 
 - name: Delete Machine
+  description: Destroys a GCP machine
   hasConfig: true
   parameters:
     - name: instanceName
@@ -129,6 +130,7 @@ procedures:
     condition: ${config} != ""
     dependsOn: config
     label: Instance Type
+#    serverOptions: 1
     type: entry
     documentation: Instance type, e.g. n1-standard-2
   - name: sourceImage

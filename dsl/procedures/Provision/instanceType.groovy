@@ -17,7 +17,7 @@ def key = args.credential[0].password
 def parameters = args.parameters
 new File('/tmp/log.log').write(args.toString())
 
-GCP gcp = new GCP(key, projectId, zone)
+GCP gcp = new GCP(key, projectId, zone, true)
 
 if (parameterName == 'instanceType') {
     List<Map> types = gcp.listTypes()

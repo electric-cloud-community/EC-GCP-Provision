@@ -3,6 +3,7 @@ package com.cloudbees.flow.plugins
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.HttpTransport
+import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.JsonFactory
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.compute.ComputeScopes
@@ -19,6 +20,7 @@ import com.google.api.services.compute.model.ServiceAccount
 import com.google.api.services.compute.model.Tags
 import com.google.api.services.compute.model.Metadata
 import com.google.api.services.compute.model.NetworkInterface
+import com.google.auth.http.HttpTransportFactory
 
 import java.lang.reflect.Method
 
@@ -37,7 +39,7 @@ class GCP {
     private static final String SOURCE_IMAGE_PATH = "debian-cloud/global/images/debian-7-wheezy-v20150710";
 
 
-    GCP(String key, String projectId, String zone) {
+    GCP(String key, String projectId, String zone, boolean ignoreSsl = false) {
         GoogleCredential credential = GoogleCredential.fromStream(new ByteArrayInputStream(key.getBytes('UTF-8')))
         List<String> scopes = new ArrayList<>();
         // Set Google Cloud Storage scope to Full Control.
@@ -50,9 +52,14 @@ class GCP {
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        if (ignoreSsl) {
+            println "Ignoring SSL certificates validation"
+            httpTransport = new NetHttpTransport.Builder().doNotValidateCertificate().build()
+        }
         Compute compute = new Compute.Builder(httpTransport, jsonFactory, credential)
             .setApplicationName(APP_NAME)
             .build()
+
         this.compute = compute
         this.zone = zone
         this.projectId = projectId
