@@ -41,6 +41,8 @@ configuration:
     name: zone
     required: true
     type: entry
+    documentation: Zone name, e.g. us-east1-b
+    label: Zone
   -
     name: credential
     documentation: Service account key in JSON format

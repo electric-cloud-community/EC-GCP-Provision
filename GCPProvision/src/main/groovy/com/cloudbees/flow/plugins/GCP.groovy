@@ -21,6 +21,7 @@ import com.google.api.services.compute.model.Tags
 import com.google.api.services.compute.model.Metadata
 import com.google.api.services.compute.model.NetworkInterface
 import com.google.auth.http.HttpTransportFactory
+import groovy.json.JsonSlurper
 
 import java.lang.reflect.Method
 
@@ -30,6 +31,8 @@ class GCP {
     Compute compute
     String projectId
     String zone
+
+    private String key
 
     public static final String APP_NAME = 'CloudBees Flow GCP Plugin'
 
@@ -59,9 +62,9 @@ class GCP {
         Compute compute = new Compute.Builder(httpTransport, jsonFactory, credential)
             .setApplicationName(APP_NAME)
             .build()
-
         this.compute = compute
         this.zone = zone
+        this.key = key
         this.projectId = projectId
     }
 
@@ -123,7 +126,7 @@ class GCP {
 
         //// Initialize the service account to be used by the VM Instance and set the API access scopes.
         ServiceAccount account = new ServiceAccount()
-        account.setEmail("default")
+        account.setEmail(getServiceAccountEmail())
         List<String> scopes = new ArrayList<>()
         scopes.add("https://www.googleapis.com/auth/devstorage.full_control")
         scopes.add("https://www.googleapis.com/auth/compute")
@@ -255,6 +258,14 @@ class GCP {
                 throw new RuntimeException(messages)
             }
         }
+    }
+
+
+    private String getServiceAccountEmail() {
+        Map parsed = new JsonSlurper().parseText(this.key)
+        String email = parsed.client_email
+        assert email
+        return email
     }
 }
 

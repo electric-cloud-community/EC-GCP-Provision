@@ -23,6 +23,8 @@
     <type>entry</type>
     <property>zone</property>
     <required>1</required>
+    <documentation>Zone name, e.g. us-east1-b</documentation>
+    <label>Zone:</label>
   </formElement>
   <formElement>
     <type>credential</type>
