@@ -119,6 +119,8 @@ procedures:
 #          instanceType:
 #            path: 'dsl/procedures/Provision/instanceType.groovy'
 
+  outputParameters:
+    instanceDetails: Details for the created instances
   parameters:
   - name: instanceNameTemplate
     required: false
@@ -198,3 +200,9 @@ procedures:
     label: Resource Workspace
     dependsOn: resourcePoolName
     condition: ${resourcePoolName} != ""
+  - name: resultProperty
+    value: /myJob/result
+    type: entry
+    required: false
+    documentation: Property sheet to store instance result
+    label: Result Property

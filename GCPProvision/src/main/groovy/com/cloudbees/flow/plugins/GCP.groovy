@@ -192,7 +192,7 @@ class GCP {
 
     String getInstanceExternalIp(String instanceName) {
         Instance instance = compute.instances().get(projectId, zone, instanceName).execute()
-        String externalIp = instance.getNetworkInterfaces().first().getAccessConfigs().first().getNatIP()
+        String externalIp = instance.getNetworkInterfaces().first().getAccessConfigs()?.first()?.getNatIP()
         return externalIp
     }
 

@@ -1,5 +1,6 @@
 import com.cloudbees.flowpdf.*
 import com.cloudbees.flow.plugins.*
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import com.electriccloud.client.groovy.models.ActualParameter
 
@@ -129,7 +130,7 @@ class GCPProvision extends FlowPlugin {
         def workspace = param.resourceWorkspace ?: 'default'
         def resourcePool = param.resourcePoolName
         if (resourcePool) {
-            for(String name in names) {
+            for (String name in names) {
                 String ip = gcp.getInstanceInternalIp(name)
                 log.info "Instance $name has IP $ip"
                 //TODO external
@@ -146,15 +147,46 @@ class GCPProvision extends FlowPlugin {
                 log.info "Created resource $name in the pool $resourcePool"
             }
         }
+
+        def details = [:]
+        String resultProperty = param.resultProperty
+        for (String name in names) {
+            def instance = gcp.getInstance(name)
+            String internalIp = gcp.getInstanceInternalIp(name)
+            String externalIp = gcp.getInstanceExternalIp(name) ?: ""
+            details.put(name, [
+                internalIp: internalIp,
+                externalIp: externalIp,
+                link: instance.getSelfLink()
+            ])
+            if (names.size() == 1) {
+                FlowAPI.setFlowProperty("$resultProperty/instanceName", name)
+                FlowAPI.setFlowProperty("$resultProperty/internalIp", internalIp)
+                FlowAPI.setFlowProperty("$resultProperty/externalIp", externalIp)
+                if (resourcePool) {
+                    FlowAPI.setFlowProperty("$resultProperty/resourceName", name)
+                }
+            }
+            else {
+                FlowAPI.setFlowProperty("$resultProperty/$name/instanceName", name)
+                FlowAPI.setFlowProperty("$resultProperty/$name/internalIp", internalIp)
+                FlowAPI.setFlowProperty("$resultProperty/$name/externalIp", externalIp)
+                if (resourcePool) {
+                    FlowAPI.setFlowProperty("$resultProperty/$name/resourceName", name)
+                }
+            }
+        }
+        FlowAPI.setFlowProperty("$resultProperty/json", JsonOutput.toJson(details))
+        sr.setOutputParameter('instanceDetails', JsonOutput.toJson(details))
+        sr.apply()
     }
 
     private static generateInstanceName(String template) {
         String instanceName = template
             .toLowerCase()
-            .replaceAll(/[\W]/, '')
-            .replaceAll(/[\s_]/, '-') + '-' + Random.newInstance().nextInt()
+            .replaceAll(/[^a-z0-9]+/, '-') + '-' + Random.newInstance().nextInt()
         instanceName = instanceName.replaceAll(/-+/, '-')
-        if (!(instanceName =~ /^[a-z]]/)) {
+        if (!(instanceName =~ /^[a-z]/)) {
             instanceName = 'i-' + instanceName
         }
         return instanceName
