@@ -92,7 +92,8 @@ class GCP {
         String instanceType = p.instanceType ?: 'n1-standard-1'
         instance.setMachineType(
             "https://www.googleapis.com/compute/v1/projects/"
-                + p.projectId + "/zones/" + p.zoneName + "/machineTypes/" + instanceType);
+                + p.projectId + "/zones/" + p.zoneName + "/machineTypes/" + instanceType)
+
 
 
         NetworkInterface ifc = new NetworkInterface();

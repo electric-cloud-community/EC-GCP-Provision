@@ -1,12 +1,13 @@
+import com.cloudbees.flow.plugins.GCP
 import com.electriccloud.client.groovy.ElectricFlow
 
 // Sample code
 ElectricFlow ef = new ElectricFlow()
-
-try {
-    String endpoint = ef.getProperty(propertyName: 'endpoint')?.property?.value
-} catch (Throwable e) {
-    // throw new RuntimeException("Connection failed")
-}
-
-println "Place your code in here"
+String projectId = ef.getProperty(propertyName: 'projectId')?.property?.value
+String zone = ef.getProperty(propertyName: 'zone')?.property?.value
+def credential = ef.getFullCredential(credentialName: 'credential')
+println credential
+def key = credential?.credential?.password
+GCP gcp = new GCP(key, projectId, zone)
+def list = gcp.compute.instances().list(projectId, zone).execute()
+println list
