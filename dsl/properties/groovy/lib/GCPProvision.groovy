@@ -3,6 +3,7 @@ import com.cloudbees.flow.plugins.*
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import com.electriccloud.client.groovy.models.ActualParameter
+import org.codehaus.groovy.control.CompilerConfiguration
 
 
 /**
@@ -331,6 +332,50 @@ class GCPProvision extends FlowPlugin {
         gcp.blockUntilComplete(operation, 60 * 1000)
     }
 
+/**
+    * runScript - Run Script/Run Script
+    * Add your code into this method and it will be called when the step runs
+    * @param config (required: true)
+    * @param script (required: )
+    
+    */
+    def runScript(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+          "runScript was invoked with StepParameters",
+          /* runtimeParameters contains both configuration and procedure parameters */
+          p.toString()
+        )
+        String script = p.getRequiredParameter('script').value
+        def compute = gcp.compute
+        def compilerConfiguration = new CompilerConfiguration()
+        compilerConfiguration.scriptBaseClass = DelegatingScript.class.name
+        def shell = new GroovyShell(this.class.classLoader, new Binding([compute: compute]), compilerConfiguration)
+        def gcpScript = new GCPScript(compute, gcp.projectId, gcp.zone)
+        Script s = shell.parse(script)
+        s.setDelegate(gcpScript)
+        def result = s.run()
+        log.info "Script evaluation result: $result"
+        if (result) {
+            sr.setOutputParameter('output', JsonOutput.toJson(result))
+        }
+    }
+
 // === step ends ===
+
+}
+
+
+class GCPScript {
+    def compute
+    def project
+    def zone
+
+    GCPScript(compute, project, zone) {
+        this.compute = compute
+        this.project = project
+        this.zone = zone
+    }
 
 }
