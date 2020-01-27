@@ -32,9 +32,22 @@
   <formElement>
     <type>entry</type>
     <property>sourceImage</property>
-    <required>1</required>
-    <documentation>Source image starting with a project name, e.g. my-project/global/images/image-name</documentation>
+    <required>0</required>
+    <documentation>Source image starting with a project name, e.g. my-project/global/images/image-name. Either URL or family should be provided.</documentation>
     <label>Source Image:</label>
+    <dependsOn>useSourceImageFamily</dependsOn>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>sourceImageProject</property>
+    <documentation>Source image project. If not set, the project from the configuration will be used.</documentation>
+    <label>Source Image Project:</label>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>sourceImageFamily</property>
+    <documentation>Source image family. Either family or URL should be provided.</documentation>
+    <label>Source Image Family:</label>
   </formElement>
   <formElement>
     <type>textarea</type>
@@ -116,6 +129,13 @@
     <value>default</value>
     <condition>${resourcePoolName} != ""</condition>
     <dependsOn>resourcePoolName</dependsOn>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>resourceZone</property>
+    <required>0</required>
+    <documentation>Zone to use for the created resource</documentation>
+    <label>Resource Zone:</label>
   </formElement>
   <formElement>
     <type>entry</type>

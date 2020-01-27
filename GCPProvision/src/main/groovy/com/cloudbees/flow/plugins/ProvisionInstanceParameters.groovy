@@ -1,5 +1,6 @@
 package com.cloudbees.flow.plugins
 
+import com.google.api.services.compute.model.Image
 import groovy.transform.builder.Builder
 
 @Builder
@@ -7,7 +8,7 @@ class ProvisionInstanceParameters {
     String instanceName
     String instanceType
     List<String> tags
-    String sourceImage
+    String sourceImageUrl
     String network
     List<ProvisionInstanceKey> keys
     String subnetwork
@@ -16,4 +17,5 @@ class ProvisionInstanceParameters {
     String regionName
     String zoneName
     boolean assignPublicIp
+    Image sourceImage
 }

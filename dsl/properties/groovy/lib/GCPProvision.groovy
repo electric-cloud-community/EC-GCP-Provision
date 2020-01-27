@@ -73,7 +73,21 @@ class GCPProvision extends FlowPlugin {
             parameters.assignPublicIp(true)
             log.info "Assigning a public IP"
         }
-        parameters.sourceImage(param.sourceImage)
+
+        if (param.sourceImage) {
+            parameters.sourceImageUrl(param.sourceImage)
+        }
+        else if (param.sourceImageFamily) {
+            String family = param.sourceImageFamily
+            String project = param.sourceImageProject ?: param.projectId
+            def image = gcp.getFromFamily(project, family)
+            log.info "Fetched image ${image.getName()} (${image.getSelfLink()})"
+            parameters.sourceImage(image)
+        }
+        else {
+            throw new RuntimeException("Either source image URL or family should be provided")
+        }
+
         log.info "Using source image $param.sourceImage"
         parameters.network(param.network)
         log.info "Using network $param.network"
@@ -123,24 +137,44 @@ class GCPProvision extends FlowPlugin {
         int port
         if (param.resourcePort) {
             port = Integer.parseInt(param.resourcePort)
-        }
-        else {
+        } else {
             port = 7800
         }
 
         def workspace = param.resourceWorkspace ?: 'default'
         def resourcePool = param.resourcePoolName
+
+        def zone = param.resourceZone ?: 'default'
         if (resourcePool) {
             for (String name in names) {
                 String ip = gcp.getInstanceInternalIp(name)
                 log.info "Instance $name has IP $ip"
-                //TODO external
                 FlowAPI.ec.createResource(
                     resourceName: name,
+                    description: 'GCP provisioned resource (dynamic)',
                     resourcePools: resourcePool,
                     workspace: workspace,
                     port: port,
-                    hostName: ip
+                    hostName: ip,
+                    zoneName: zone
+                )
+                FlowAPI.ec.createAclEntry(
+                    principalType: 'user',
+                    principalName: "project: @PLUGIN_NAME@",
+                    modifyPrivilege: 'allow',
+                    readPrivilege: 'allow',
+                    changePermissionPrivilege: 'allow',
+                    executePrivilege: 'allow',
+                    resourceName: name
+                )
+                FlowAPI.ec.createAclEntry(
+                    principalType: 'user',
+                    principalName: '$[/myJob/launchedByUser]',
+                    modifyPrivilege: 'allow',
+                    readPrivilege: 'allow',
+                    changePermissionPrivilege: 'allow',
+                    executePrivilege: 'allow',
+                    resourceName: name
                 )
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/createdBy", "@PLUGIN_KEY@")
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/instance_id", name)
@@ -158,7 +192,7 @@ class GCPProvision extends FlowPlugin {
             details.put(name, [
                 internalIp: internalIp,
                 externalIp: externalIp,
-                link: instance.getSelfLink()
+                link      : instance.getSelfLink()
             ])
             if (names.size() == 1) {
                 FlowAPI.setFlowProperty("$resultProperty/instanceName", name)
@@ -167,8 +201,7 @@ class GCPProvision extends FlowPlugin {
                 if (resourcePool) {
                     FlowAPI.setFlowProperty("$resultProperty/resourceName", name)
                 }
-            }
-            else {
+            } else {
                 FlowAPI.setFlowProperty("$resultProperty/$name/instanceName", name)
                 FlowAPI.setFlowProperty("$resultProperty/$name/internalIp", internalIp)
                 FlowAPI.setFlowProperty("$resultProperty/$name/externalIp", externalIp)
@@ -208,19 +241,19 @@ class GCPProvision extends FlowPlugin {
 
 
 /**
-    * teardown - Teardown/Teardown
-    * Add your code into this method and it will be called when the step runs
-    * @param config (required: true)
-    * @param resName (required: true)
-    
-    */
+ * teardown - Teardown/Teardown
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param resName (required: true)
+
+ */
     def teardown(StepParameters p, StepResult sr) {
 
         /* Log is automatically available from the parent class */
         log.info(
-          "teardown was invoked with StepParameters",
-          /* runtimeParameters contains both configuration and procedure parameters */
-          p.toString()
+            "teardown was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
         )
 
         String resourceName = p.getRequiredParameter('resName').value
@@ -242,7 +275,7 @@ class GCPProvision extends FlowPlugin {
             def resource = FlowAPI.ec.getResource(resourceName: resourceName)
             resources << resourceName
         }
-        catch(Throwable e) {
+        catch (Throwable e) {
             log.info "Failed to get resource $resourceName"
             log.info("${e.message}")
             return
@@ -250,7 +283,7 @@ class GCPProvision extends FlowPlugin {
 
         def configs = [:]
         boolean hasErrors = false
-        for(String resName in resources) {
+        for (String resName in resources) {
             String createdBy = FlowAPI.getFlowProperty("/resources/$resName/ec_cloud_instance_details/createdBy")
             log.info "The resource $resName is created by $createdBy"
             String instanceName = FlowAPI.getFlowProperty("/resources/$resName/ec_cloud_instance_details/instance_id")
@@ -279,8 +312,7 @@ class GCPProvision extends FlowPlugin {
                     log.info "Job $jobId completed"
                     FlowAPI.ec.deleteResource(resourceName: resName)
                     log.info "Deleted resource $resName"
-                }
-                else {
+                } else {
                     //fail
                     hasErrors = true
                     log.info "Failed to delete resource $resName: job $jobId has failed"
@@ -293,7 +325,7 @@ class GCPProvision extends FlowPlugin {
     void pollJob(String jobId) {
         log.info "Polling job $jobId"
         def status = FlowAPI.ec.getJobStatus(jobId: jobId)?.status
-        while(status != 'completed') {
+        while (status != 'completed') {
             sleep(2 * 1000)
             log.info "Polling job..."
             status = FlowAPI.ec.getJobStatus(jobId: jobId)?.status
@@ -301,18 +333,18 @@ class GCPProvision extends FlowPlugin {
     }
 
 /**
-    * deleteMachine - Delete Machine/Delete Machine
-    * Add your code into this method and it will be called when the step runs
-    * @param config (required: true)
-    * @param instanceName (required: true)
-    
-    */
+ * deleteMachine - Delete Machine/Delete Machine
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param instanceName (required: true)
+
+ */
     def deleteMachine(StepParameters p, StepResult sr) {
         /* Log is automatically available from the parent class */
         log.info(
-          "deleteMachine was invoked with StepParameters",
-          /* runtimeParameters contains both configuration and procedure parameters */
-          p.toString()
+            "deleteMachine was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
         )
 
         String instanceName = p.getRequiredParameter('instanceName').value
@@ -333,19 +365,19 @@ class GCPProvision extends FlowPlugin {
     }
 
 /**
-    * runScript - Run Script/Run Script
-    * Add your code into this method and it will be called when the step runs
-    * @param config (required: true)
-    * @param script (required: )
-    
-    */
+ * runScript - Run Script/Run Script
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param script (required: )
+
+ */
     def runScript(StepParameters p, StepResult sr) {
 
         /* Log is automatically available from the parent class */
         log.info(
-          "runScript was invoked with StepParameters",
-          /* runtimeParameters contains both configuration and procedure parameters */
-          p.toString()
+            "runScript was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
         )
         String script = p.getRequiredParameter('script').value
         def compute = gcp.compute
@@ -360,6 +392,59 @@ class GCPProvision extends FlowPlugin {
         if (result) {
             sr.setOutputParameter('output', JsonOutput.toJson(result))
         }
+    }
+
+/**
+ * stopInstance - Stop Instance/Stop Instance
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param instanceName (required: true)
+
+ */
+    def stopInstance(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+            "stopInstance was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
+        )
+
+        String name = p.getRequiredParameter('instanceName').value
+        def operation = gcp.stopInstance(name)
+        gcp.blockUntilComplete(operation, 60 * 1000)
+    }
+
+/**
+ * startInstance - Start Instance/Start Instance
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param instanceName (required: true)
+
+ */
+    def startInstance(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+            "startInstance was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
+        )
+
+        String name = p.getRequiredParameter('instanceName').value
+        def operation = gcp.stopInstance(name)
+        gcp.blockUntilComplete(operation, 60 * 1000)
+        def instance = gcp.getInstance(name)
+        def ip = gcp.getInstanceInternalIp(name)
+        def publicIp = gcp.getInstanceExternalIp(name)
+        log.info "Instance Public IP: $publicIp"
+        log.info "Instance privateIP: $ip"
+
+        sr.setOutputParameter('ip', ip)
+        sr.apply()
+
+        String resultProperty = p.getRequiredParameter('resultProperty').value
+        FlowAPI.setFlowProperty("$resultProperty/ip", ip)
     }
 
 // === step ends ===

@@ -11,6 +11,7 @@ import com.google.api.services.compute.Compute
 import com.google.api.services.compute.model.AccessConfig
 import com.google.api.services.compute.model.AttachedDisk
 import com.google.api.services.compute.model.AttachedDiskInitializeParams
+import com.google.api.services.compute.model.Image
 import com.google.api.services.compute.model.ImageList
 import com.google.api.services.compute.model.Instance
 import com.google.api.services.compute.model.MachineTypeList
@@ -20,11 +21,7 @@ import com.google.api.services.compute.model.ServiceAccount
 import com.google.api.services.compute.model.Tags
 import com.google.api.services.compute.model.Metadata
 import com.google.api.services.compute.model.NetworkInterface
-import com.google.auth.http.HttpTransportFactory
 import groovy.json.JsonSlurper
-
-import java.lang.reflect.Method
-
 
 class GCP {
 
@@ -85,6 +82,13 @@ class GCP {
         return instance
     }
 
+
+    Image getFromFamily(String project, String family) {
+        Image image = compute.images().getFromFamily(project, family).execute()
+        return image
+    }
+
+
     Operation provisionInstance(ProvisionInstanceParameters p) {
         Instance instance = new Instance()
         String instanceName = p.instanceName
@@ -96,7 +100,6 @@ class GCP {
         instance.setMachineType(
             "https://www.googleapis.com/compute/v1/projects/"
                 + p.projectId + "/zones/" + p.zoneName + "/machineTypes/" + instanceType)
-
 
 
         NetworkInterface ifc = new NetworkInterface();
@@ -143,9 +146,15 @@ class GCP {
         // Assign the Persistent Disk the same name as the VM Instance.
         params.setDiskName(p.instanceName);
 
+        //compute.images().list(projectId).execute().getItems().first().getFamily()
         // Specify the source operating system machine image to be used by the VM Instance.
-        String sourceImage = p.sourceImage ?: SOURCE_IMAGE_PATH
-        params.setSourceImage(SOURCE_IMAGE_PREFIX + sourceImage)
+        if (p.sourceImage) {
+            params.setSourceImage(p.sourceImage.getSelfLink())
+            //todo log
+        } else {
+            String sourceImage = p.sourceImageUrl ?: SOURCE_IMAGE_PATH
+            params.setSourceImage(SOURCE_IMAGE_PREFIX + sourceImage)
+        }
 
         // Specify the disk type as Standard Persistent Disk
         params.setDiskType("https://www.googleapis.com/compute/v1/projects/"
@@ -162,7 +171,7 @@ class GCP {
         Metadata metadata = Metadata.newInstance()
         List<Metadata.Items> items = []
         if (p.keys) {
-            for(ProvisionInstanceKey key in p.keys) {
+            for (ProvisionInstanceKey key in p.keys) {
                 Metadata.Items item = new Metadata.Items();
                 item.setKey('ssh-keys')
                 item.setValue("${key.userName}:${key.key}")

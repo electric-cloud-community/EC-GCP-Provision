@@ -120,6 +120,45 @@ procedures:
   outputParameters:
     output: Some output parameter to use in the script
 
+
+- name: Stop Instance
+  hasConfig: true
+  description: Stops a GCP instance
+  parameters:
+    - name: instanceName
+      required: true
+      documentation: The name of the instance to stop
+      label: Instance Name
+      type: entry
+
+- name: Start Instance
+  hasConfig: true
+  description: Starts a GCP instance
+  parameters:
+    - name: instanceName
+      required: true
+      documentation: The name of the instance to start
+      label: Instance Name
+      type: entry
+    - name: resultProperty
+      required: true
+      value: '/myJob/result'
+      type: entry
+      label: Result Property Sheet
+  outputParameters:
+    ip: Will be set to the instance ip
+
+#
+#- name: Scale Pool
+#  hasConfig: false
+#  shell: ec-perl
+#  parameters:
+#    - name: poolName
+#      required: true
+#    - name: max
+#      required: true
+#    - name: min
+#      required: true
 -
   name: 'Provision'
   description: Creates one or few instances from the provided parameters
@@ -150,14 +189,21 @@ procedures:
     condition: ${config} != ""
     dependsOn: config
     label: Instance Type
-#    serverOptions: 1
     type: entry
     documentation: Instance type, e.g. n1-standard-2
   - name: sourceImage
-    required: true
+    required: false
     type: entry
     label: Source Image
-    documentation: Source image starting with a project name, e.g. my-project/global/images/image-name
+    documentation: Source image starting with a project name, e.g. my-project/global/images/image-name. Either URL or family should be provided.
+    dependsOn: useSourceImageFamily
+  - name: sourceImageProject
+    label: Source Image Project
+    documentation: Source image project. If not set, the project from the configuration will be used.
+  - name: sourceImageFamily
+    label: Source Image Family
+    type: entry
+    documentation: Source image family. Either family or URL should be provided.
   - name: keys
     type: textarea
     required: false
@@ -218,6 +264,11 @@ procedures:
     label: Resource Workspace
     dependsOn: resourcePoolName
     condition: ${resourcePoolName} != ""
+  - name: resourceZone
+    type: entry
+    documentation: Zone to use for the created resource
+    label: Resource Zone
+    required: false
   - name: resultProperty
     value: /myJob/result
     type: entry
