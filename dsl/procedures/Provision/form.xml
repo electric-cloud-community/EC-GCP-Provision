@@ -35,7 +35,6 @@
     <required>0</required>
     <documentation>Source image starting with a project name, e.g. my-project/global/images/image-name. Either URL or family should be provided.</documentation>
     <label>Source Image:</label>
-    <dependsOn>useSourceImageFamily</dependsOn>
   </formElement>
   <formElement>
     <type>entry</type>
@@ -136,6 +135,8 @@
     <required>0</required>
     <documentation>Zone to use for the created resource</documentation>
     <label>Resource Zone:</label>
+    <condition>${resourcePoolName} != ""</condition>
+    <dependsOn>resourcePoolName</dependsOn>
   </formElement>
   <formElement>
     <type>entry</type>

@@ -196,7 +196,6 @@ procedures:
     type: entry
     label: Source Image
     documentation: Source image starting with a project name, e.g. my-project/global/images/image-name. Either URL or family should be provided.
-    dependsOn: useSourceImageFamily
   - name: sourceImageProject
     label: Source Image Project
     documentation: Source image project. If not set, the project from the configuration will be used.
@@ -269,6 +268,8 @@ procedures:
     documentation: Zone to use for the created resource
     label: Resource Zone
     required: false
+    dependsOn: resourcePoolName
+    condition: ${resourcePoolName} != ""
   - name: resultProperty
     value: /myJob/result
     type: entry
