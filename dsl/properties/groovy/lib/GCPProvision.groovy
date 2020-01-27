@@ -153,7 +153,7 @@ class GCPProvision extends FlowPlugin {
                     resourceName: name,
                     description: 'GCP provisioned resource (dynamic)',
                     resourcePools: resourcePool,
-                    workspace: workspace,
+                    workspaceName: workspace,
                     port: port,
                     hostName: ip,
                     zoneName: zone
