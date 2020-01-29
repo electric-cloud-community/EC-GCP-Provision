@@ -18,4 +18,5 @@ class ProvisionInstanceParameters {
     String zoneName
     boolean assignPublicIp
     Image sourceImage
+    String description
 }

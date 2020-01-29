@@ -1,9 +1,12 @@
 import com.cloudbees.flowpdf.*
 import com.cloudbees.flow.plugins.*
+import groovy.json.JsonBuilder
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import com.electriccloud.client.groovy.models.ActualParameter
 import org.codehaus.groovy.control.CompilerConfiguration
+
+import java.text.SimpleDateFormat
 
 
 /**
@@ -76,15 +79,13 @@ class GCPProvision extends FlowPlugin {
 
         if (param.sourceImage) {
             parameters.sourceImageUrl(param.sourceImage)
-        }
-        else if (param.sourceImageFamily) {
+        } else if (param.sourceImageFamily) {
             String family = param.sourceImageFamily
             String project = param.sourceImageProject ?: param.projectId
             def image = gcp.getFromFamily(project, family)
             log.info "Fetched image ${image.getName()} (${image.getSelfLink()})"
             parameters.sourceImage(image)
-        }
-        else {
+        } else {
             throw new RuntimeException("Either source image URL or family should be provided")
         }
 
@@ -94,11 +95,13 @@ class GCPProvision extends FlowPlugin {
         parameters.subnetwork(param.subnetwork)
         log.info "Using subnetwork $param.subnetwork"
 
+
         if (param.instanceTags) {
             List<String> tags = param.instanceTags.split(/\s*\n\s*/)
             log.info "Using tags $tags"
             parameters.tags(tags)
         }
+
 
         if (param.keys) {
             List mapKeys = new JsonSlurper().parseText(param.keys)
@@ -127,11 +130,11 @@ class GCPProvision extends FlowPlugin {
             def operation = gcp.provisionInstance(parameters.instanceName(name).build())
             names.add(name)
             log.info("Launched operation: ${operation.getName()}")
-            //gcp.blockUntilComplete(operation, 60 * 1000)
             operations.add(operation)
         }
+        int timeout = p.getParameter('waitTimeout')?.value as int ?: 300
         operations.each {
-            gcp.blockUntilComplete(it, 60 * 1000)
+            gcp.blockUntilComplete(it, timeout * 1000)
         }
 
         int port
@@ -296,11 +299,12 @@ class GCPProvision extends FlowPlugin {
                 //configs.put(config, instances)
 
                 def result = FlowAPI.ec.runProcedure(
-                    procedureName: 'Delete Machine',
+                    procedureName: 'Delete Instances',
                     projectName: '/plugins/@PLUGIN_KEY@/project',
                     actualParameters: [
                         new ActualParameter('config', config),
-                        new ActualParameter('instanceName', instanceName),
+                        new ActualParameter('instanceNames', instanceName),
+                        new ActualParameter('timeoutSeconds', '300'),
                     ]
                 )
                 def jobId = result?.jobId
@@ -330,38 +334,6 @@ class GCPProvision extends FlowPlugin {
             log.info "Polling job..."
             status = FlowAPI.ec.getJobStatus(jobId: jobId)?.status
         }
-    }
-
-/**
- * deleteMachine - Delete Machine/Delete Machine
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceName (required: true)
-
- */
-    def deleteMachine(StepParameters p, StepResult sr) {
-        /* Log is automatically available from the parent class */
-        log.info(
-            "deleteMachine was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
-
-        String instanceName = p.getRequiredParameter('instanceName').value
-        def instance
-        try {
-            instance = gcp.getInstance(instanceName)
-            log.info "Instance: $instance"
-        }
-        catch (Throwable e) {
-            log.info "$e.message"
-            log.info "Cannot get instance $instanceName: probably already deleted"
-            return
-        }
-
-        def operation = gcp.deleteInstance(instanceName)
-        log.info "Launched operation ${operation.getName()}"
-        gcp.blockUntilComplete(operation, 60 * 1000)
     }
 
 /**
@@ -447,7 +419,149 @@ class GCPProvision extends FlowPlugin {
         FlowAPI.setFlowProperty("$resultProperty/ip", ip)
     }
 
+/**
+ * listInstances - List Instances/List Instances
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param filter (required: false)
+ * @param maxResults (required: )
+ * @param orderBy (required: false)
+ * @param resultProperty (required: true)
+
+ */
+    def listInstances(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+            "listInstances was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
+        )
+
+        def param = ListInstancesParameters.builder()
+        Map pMap = p.asMap
+
+        if (pMap.filter) {
+            param.filter(pMap.filter)
+        }
+        if (pMap.orderBy) {
+            param.orderBy(pMap.orderBy)
+        }
+        if (pMap.maxResults) {
+            param.maxResults(Long.parseLong(pMap.maxResults))
+        }
+        def instances = gcp.listInstances(param.build())
+        String result = p.getRequiredParameter('resultProperty').value
+
+        def json = JsonOutput.toJson(instances)
+        def names = []
+        for (def instance in instances) {
+            String name = instance.getName()
+            FlowAPI.setFlowProperty("$result/$name/createdAt", instance.getCreationTimestamp())
+            FlowAPI.setFlowProperty("$result/$name/status", instance.getStatus())
+            FlowAPI.setFlowProperty("$result/$name/deletionProtection", instance.getDeletionProtection().toString())
+
+            log.info "=================================="
+            log.info "Found instance $name"
+            log.info "Created at: ${instance.getCreationTimestamp()}"
+            log.info "Status: ${instance.getStatus()}"
+            log.info "Deletion protection: ${instance.getDeletionProtection()}"
+
+            names << name
+        }
+        FlowAPI.setFlowProperty("$result/names", names.join(", "))
+        FlowAPI.setFlowProperty("$result/json", json)
+        log.info "Instances data: " + new JsonBuilder(instances).toPrettyString()
+        sr.setOutputParameter("instances", json)
+    }
+
+/**
+ * deleteInstances - Delete Machines/Delete Machines
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param instanceNames (required: true)
+ * @param timeoutSeconds (required: )
+
+ */
+    def deleteInstances(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+            "deleteMachines was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
+        )
+
+        String instanceNames = p.getRequiredParameter('instanceNames').value
+        int timeout = p.getRequiredParameter('timeoutSeconds').value as int
+
+        def names = instanceNames.split(/\n+/)
+        def operations = []
+        names.each { name ->
+            try {
+                def instance = gcp.getInstance(name)
+                log.info "Found instance ${instance.getName()}"
+                def operation = gcp.deleteInstance(name)
+                operations << operation
+                log.info "Launched operation ${operation.getName()}"
+            } catch (Throwable e) {
+                log.warning e.getMessage()
+                log.warning e.getClass().getName()
+                log.info("Cannot get instance $name: probably already deleted")
+            }
+        }
+
+        operations.each { op ->
+            gcp.blockUntilComplete(op, timeout * 1000)
+        }
+    }
+
+/**
+    * cleanupInstances - Cleanup Instances/Cleanup Instances
+    * Add your code into this method and it will be called when the step runs
+    * @param config (required: true)
+    * @param filter (required: )
+    * @param age (required: )
+    * @param dryRun (required: )
+    
+    */
+    def cleanupInstances(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+          "cleanupInstances was invoked with StepParameters",
+          /* runtimeParameters contains both configuration and procedure parameters */
+          p.toString()
+        )
+
+        //2020-01-28T07:14:14.593-08:00",
+        Date now = new Date()
+        long nowTime = now.getTime()
+        int hours = p.asMap.age as int
+        def instances = gcp.listInstances(ListInstancesParameters.builder().filter(p.asMap.filter).build())
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        def oeprations = []
+        for(def instance in instances) {
+            if (instance.getDeletionProtection()) {
+                log.info "Instance ${instance.getName()} is protected from deletion"
+                continue
+            }
+            Date creationDate = format.parse(instance.getCreationTimestamp())
+            long age = nowTime - creationDate.getTime()
+            long ageHours = age / (1000 * 60 * 60)
+            if (ageHours > hours) {
+                log.info "Found instance ${instance.getName()} of age $ageHours hours"
+            }
+        }
+    }
+
 // === step ends ===
+
+    String getRuntimeLink() {
+        String jobId = System.getenv('COMMANDER_JOBID')
+        def link = "/commander/link/jobDetails/$jobId"
+        return 'http://$[/server/webServerHost]' + link
+    }
 
 }
 

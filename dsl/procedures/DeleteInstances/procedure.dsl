@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Delete Machine', description: '''Destroys a GCP machine''', {
+procedure 'Delete Instances', description: '''Destroys GCP machines''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -11,9 +11,9 @@ procedure 'Delete Machine', description: '''Destroys a GCP machine''', {
         ]
     }
 
-    step 'Delete Machine', {
+    step 'Delete Instances', {
         description = ''
-        command = new File(pluginDir, "dsl/procedures/DeleteMachine/steps/DeleteMachine.groovy").text
+        command = new File(pluginDir, "dsl/procedures/DeleteInstances/steps/DeleteInstances.groovy").text
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
@@ -21,7 +21,7 @@ procedure 'Delete Machine', description: '''Destroys a GCP machine''', {
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: d1f5f1e4ef8016cb002ebdb83a1043e9 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 27a2525e0c96ce97037e0d33f94cfba0 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

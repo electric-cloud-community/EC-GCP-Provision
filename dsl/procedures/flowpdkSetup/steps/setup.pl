@@ -14,6 +14,8 @@ use File::Path qw(mkpath);
 use File::Temp q(tempfile);
 use File::Copy::Recursive qw(rcopy);
 
+$|++;
+
 use constant {
     META_PROPERTY => '/myProject/ec_binary_dependencies',
     DEPS_CACHE => "depsCache",

@@ -1,0 +1,53 @@
+<!--
+    This form is generated automatically from the parameters pluginspec.
+    Please not not edit this file manually as it will be regenerated.
+-->
+<editor>
+  <help>/commander/pages/@PLUGIN_NAME@/help?s=Administration&amp;ss=Plugins#ListInstances</help>
+  <formElement>
+    <type>entry</type>
+    <property>config</property>
+    <configuration>1</configuration>
+    <propertyReference>/plugins/@PLUGIN_NAME@/project/ec_plugin_cfgs</propertyReference>
+    <required>1</required>
+    <documentation>Previously defined configuration for the plugin</documentation>
+    <label>Configuration Name:</label>
+  </formElement>
+  <formElement>
+    <type>textarea</type>
+    <property>filter</property>
+    <required>0</required>
+    <documentation>A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, &gt;, or &lt;.
+
+For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
+</documentation>
+    <label>Filter:</label>
+  </formElement>
+  <formElement>
+    <type>integer</type>
+    <property>maxResults</property>
+    <documentation>The maximum number of results per page that should be returned. If the number of available results is larger than maxResults, Compute Engine returns a nextPageToken that can be used to get the next page of results in subsequent list requests. Acceptable values are 0 to 500, inclusive. (Default: 500)
+</documentation>
+    <label>Max Results:</label>
+    <requred>false</requred>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>orderBy</property>
+    <required>0</required>
+    <documentation>Sorts list results by a certain order. By default, results are returned in alphanumerical order based on the resource name.
+
+You can also sort results in descending order based on the creation timestamp using orderBy="creationTimestamp desc". This sorts results based on the creationTimestamp field in reverse chronological order (newest result first). Use this to sort resources like operations so that the newest operation is returned first.
+
+Currently, only sorting by name or creationTimestamp desc is supported.
+</documentation>
+    <label>Order By:</label>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>resultProperty</property>
+    <required>1</required>
+    <label>Result Property Sheet:</label>
+    <value>/myJob/instances</value>
+  </formElement>
+</editor>

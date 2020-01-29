@@ -3,7 +3,7 @@
     Please not not edit this file manually as it will be regenerated.
 -->
 <editor>
-  <help>/commander/pages/@PLUGIN_NAME@/help?s=Administration&amp;ss=Plugins#DeleteMachine</help>
+  <help>/commander/pages/@PLUGIN_NAME@/help?s=Administration&amp;ss=Plugins#DeleteInstances</help>
   <formElement>
     <type>entry</type>
     <property>config</property>
@@ -14,8 +14,17 @@
     <label>Configuration Name:</label>
   </formElement>
   <formElement>
-    <type>entry</type>
-    <property>instanceName</property>
+    <type>textarea</type>
+    <property>instanceNames</property>
     <required>1</required>
+    <documentation>Newline-separated instance names to delete</documentation>
+    <label>Instance Names:</label>
+  </formElement>
+  <formElement>
+    <type>integer</type>
+    <property>timeoutSeconds</property>
+    <documentation>Timeout to wait for instances to be deleted in seconds</documentation>
+    <label>Timeout in Seconds:</label>
+    <value>300</value>
   </formElement>
 </editor>

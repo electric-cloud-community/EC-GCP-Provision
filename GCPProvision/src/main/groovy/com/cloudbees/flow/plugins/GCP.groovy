@@ -88,6 +88,21 @@ class GCP {
         return image
     }
 
+    def listInstances(ListInstancesParameters p) {
+        Compute.Instances.List list = compute.instances().list(projectId, zone)
+        if (p.filter) {
+            list.setFilter(p.filter)
+        }
+        if (p.maxResults) {
+            list.setMaxResults(p.maxResults)
+        }
+        if (p.orderBy) {
+            list.setOrderBy(p.orderBy)
+        }
+        List<Instance> instances = list.execute().getItems()
+        return instances
+    }
+
 
     Operation provisionInstance(ProvisionInstanceParameters p) {
         Instance instance = new Instance()
@@ -96,6 +111,9 @@ class GCP {
             throw new RuntimeException("instanceName uis not provided")
         }
         instance.setName(p.instanceName)
+
+        instance.setDescription(p.description ?: "Provisioned automatically by EC-GCP-Provision CloudBees Flow plugin")
+
         String instanceType = p.instanceType ?: 'n1-standard-1'
         instance.setMachineType(
             "https://www.googleapis.com/compute/v1/projects/"
@@ -155,7 +173,6 @@ class GCP {
             String sourceImage = p.sourceImageUrl ?: SOURCE_IMAGE_PATH
             params.setSourceImage(SOURCE_IMAGE_PREFIX + sourceImage)
         }
-
         // Specify the disk type as Standard Persistent Disk
         params.setDiskType("https://www.googleapis.com/compute/v1/projects/"
             + p.projectId + "/zones/"
