@@ -208,7 +208,13 @@ procedures:
   outputParameters:
     instances: JSON representation of instances found
 
-
+- name: Reset Instances
+  hasConfig: true
+  parameters:
+    - name: instanceNames
+      required: true
+      type: textarea
+      documentation: Newline-separated instance names
 
   #
 #- name: Scale Pool

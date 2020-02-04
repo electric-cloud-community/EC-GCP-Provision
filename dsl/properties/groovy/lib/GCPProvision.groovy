@@ -97,7 +97,7 @@ class GCPProvision extends FlowPlugin {
 
 
         if (param.instanceTags) {
-            List<String> tags = param.instanceTags.split(/\s*\n\s*/)
+            List<String> tags = param.instanceTags.split(/\s*\n+\s*/)
             log.info "Using tags $tags"
             parameters.tags(tags)
         }
@@ -356,13 +356,14 @@ class GCPProvision extends FlowPlugin {
         def compilerConfiguration = new CompilerConfiguration()
         compilerConfiguration.scriptBaseClass = DelegatingScript.class.name
         def shell = new GroovyShell(this.class.classLoader, new Binding([compute: compute]), compilerConfiguration)
-        def gcpScript = new GCPScript(compute, gcp.projectId, gcp.zone)
+        def gcpScript = new GCPScript(compute, gcp.projectId, gcp.zone, FlowAPI.ec, gcp)
         Script s = shell.parse(script)
         s.setDelegate(gcpScript)
         def result = s.run()
         log.info "Script evaluation result: $result"
         if (result) {
             sr.setOutputParameter('output', JsonOutput.toJson(result))
+            sr.setJobStepSummary(new JsonBuilder(result).toPrettyString())
         }
     }
 
@@ -517,21 +518,21 @@ class GCPProvision extends FlowPlugin {
     }
 
 /**
-    * cleanupInstances - Cleanup Instances/Cleanup Instances
-    * Add your code into this method and it will be called when the step runs
-    * @param config (required: true)
-    * @param filter (required: )
-    * @param age (required: )
-    * @param dryRun (required: )
-    
-    */
+ * cleanupInstances - Cleanup Instances/Cleanup Instances
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param filter (required: )
+ * @param age (required: )
+ * @param dryRun (required: )
+
+ */
     def cleanupInstances(StepParameters p, StepResult sr) {
 
         /* Log is automatically available from the parent class */
         log.info(
-          "cleanupInstances was invoked with StepParameters",
-          /* runtimeParameters contains both configuration and procedure parameters */
-          p.toString()
+            "cleanupInstances was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
         )
 
         //2020-01-28T07:14:14.593-08:00",
@@ -541,7 +542,7 @@ class GCPProvision extends FlowPlugin {
         def instances = gcp.listInstances(ListInstancesParameters.builder().filter(p.asMap.filter).build())
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         def oeprations = []
-        for(def instance in instances) {
+        for (def instance in instances) {
             if (instance.getDeletionProtection()) {
                 log.info "Instance ${instance.getName()} is protected from deletion"
                 continue
@@ -552,6 +553,34 @@ class GCPProvision extends FlowPlugin {
             if (ageHours > hours) {
                 log.info "Found instance ${instance.getName()} of age $ageHours hours"
             }
+        }
+    }
+
+/**
+ * resetInstances - Reset Instances/Reset Instances
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param instanceNames (required: true)
+
+ */
+    def resetInstances(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+            "resetInstances was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
+        )
+
+        String instanceNames = p.getRequiredParameter('instanceNames').value
+        def operations = instanceNames.split(/\s*\n+\s*/).collect { name ->
+            log.info "Instance $name is going to reset"
+            gcp.resetInstance(name.trim())
+        }
+        operations.each {
+            log.info "Waiting for the operation ${it.getName()}"
+            gcp.blockUntilComplete(it, 300 * 1000)
+            log.info "Operation ${it.getName()} has completed"
         }
     }
 
@@ -570,11 +599,15 @@ class GCPScript {
     def compute
     def project
     def zone
+    def ef
+    def wrapper
 
-    GCPScript(compute, project, zone) {
+    GCPScript(compute, project, zone, ef, wrapper) {
         this.compute = compute
         this.project = project
         this.zone = zone
+        this.ef = ef
+        this.wrapper = wrapper
     }
 
 }

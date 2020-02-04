@@ -245,6 +245,14 @@ class GCP {
         }
     }
 
+    void tes() {
+        compute.instances().list(project, zone).execute()
+    }
+
+    Operation resetInstance(String name) {
+        return compute.instances().reset(projectId, zone, name).execute()
+    }
+
     void blockUntilComplete(Operation operation, long timeout) {
         long start = System.currentTimeMillis();
         final long pollInterval = 5 * 1000;
