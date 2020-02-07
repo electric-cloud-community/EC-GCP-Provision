@@ -246,9 +246,18 @@ class GCPProvision extends FlowPlugin {
     }
 
     private static generateInstanceName(String template) {
+
+        def generator = { String alphabet, int n ->
+            new Random().with {
+                (1..n).collect { alphabet[ nextInt( alphabet.length() ) ] }.join()
+            }
+        }
+
+        def random = generator( (('a'..'z')+('0'..'9')).join(), 5)
+
         String instanceName = template
             .toLowerCase()
-            .replaceAll(/[^a-z0-9]+/, '-') + '-' + Random.newInstance().nextInt()
+            .replaceAll(/[^a-z0-9]+/, '-') + '-' + random
         instanceName = instanceName.replaceAll(/-+/, '-')
         if (!(instanceName =~ /^[a-z]/)) {
             instanceName = 'i-' + instanceName
@@ -308,7 +317,6 @@ class GCPProvision extends FlowPlugin {
         catch (Throwable e) {
             log.info "Failed to get resource $resourceName"
             log.info("${e.message}")
-            return
         }
 
         def configs = [:]

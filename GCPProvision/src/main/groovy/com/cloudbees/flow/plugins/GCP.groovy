@@ -194,12 +194,15 @@ class GCP {
         Metadata metadata = Metadata.newInstance()
         List<Metadata.Items> items = []
         if (p.keys) {
+            def keyStrings = []
             for (ProvisionInstanceKey key in p.keys) {
-                Metadata.Items item = new Metadata.Items();
-                item.setKey('ssh-keys')
-                item.setValue("${key.userName}:${key.key}")
-                items << item
+                String keyString = "$key.userName: $key.key $key.userName"
+                keyStrings << keyString
             }
+            Metadata.Items item = new Metadata.Items();
+            item.setKey('ssh-keys')
+            item.setValue(keyStrings.join("\n"))
+            items << item
         }
         if (p.hostname) {
             instance.setHostname(p.hostname)
