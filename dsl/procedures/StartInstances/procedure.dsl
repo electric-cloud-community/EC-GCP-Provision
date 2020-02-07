@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Stop Instance', description: '''Stops a GCP instance''', {
+procedure 'Start Instances', description: '''Starts GCP instances''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -11,9 +11,9 @@ procedure 'Stop Instance', description: '''Stops a GCP instance''', {
         ]
     }
 
-    step 'Stop Instance', {
+    step 'Start Instances', {
         description = ''
-        command = new File(pluginDir, "dsl/procedures/StopInstance/steps/StopInstance.groovy").text
+        command = new File(pluginDir, "dsl/procedures/StartInstances/steps/StartInstances.groovy").text
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
@@ -21,7 +21,10 @@ procedure 'Stop Instance', description: '''Stops a GCP instance''', {
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 2328a84aab6eb26d08e10edd55d88fac ===
+
+    formalOutputParameter 'instances',
+        description: 'JSON representation of instances'
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 04880a406f5ec2330bcb12d6b59cbb3e ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

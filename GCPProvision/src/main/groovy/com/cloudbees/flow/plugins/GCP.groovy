@@ -69,7 +69,10 @@ class GCP {
     Operation stopInstance(String instanceName) {
         Compute.Instances.Stop stop = compute.instances().stop(projectId, zone, instanceName)
         return stop.execute()
+    }
 
+    Operation startInstance(String instanceName) {
+        compute.instances().start(projectId, zone, instanceName).execute()
     }
 
     Operation deleteInstance(String instanceName) {
@@ -136,6 +139,9 @@ class GCP {
             config.setName(NETWORK_ACCESS_CONFIG);
             configs.add(config);
         }
+        if (p.deletionProtection) {
+            instance.setDeletionProtection(true)
+        }
 
         ifc.setAccessConfigs(configs)
         instance.setNetworkInterfaces(Collections.singletonList(ifc))
@@ -195,6 +201,9 @@ class GCP {
                 items << item
             }
         }
+        if (p.hostname) {
+            instance.setHostname(p.hostname)
+        }
         metadata.setItems(items)
         instance.setMetadata(metadata)
 
@@ -245,8 +254,26 @@ class GCP {
         }
     }
 
-    void tes() {
-        compute.instances().list(project, zone).execute()
+
+    Operation createImage(CreateImageParameters p) {
+        Image image = new Image()
+        if (p.sourceImage) {
+            image.setSourceImage(p.sourceImage)
+        }
+        else if (p.sourceDisk) {
+            image.setSourceDisk("/zones/$p.zone/disks/$p.sourceDisk")
+        }
+        else if (p.sourceSnapshot) {
+            image.setSourceSnapshot(p.sourceSnapshot)
+        }
+        else {
+            throw new RuntimeException("Either source image, snapshot or disk must be provided")
+        }
+        if (p.family) {
+            image.setFamily(p.family)
+        }
+        image.setDescription(p.description)
+        return null
     }
 
     Operation resetInstance(String name) {

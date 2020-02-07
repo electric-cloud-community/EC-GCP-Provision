@@ -52,6 +52,12 @@ class GCPProvision extends FlowPlugin {
 
         Map<String, String> param = p.asMap
 
+        for (String key : param.keySet()) {
+            if (param.get(key) instanceof String) {
+                param.put(key, param.get(key).trim())
+            }
+        }
+
         String instanceNameTemplate = p.getParameter('instanceNameTemplate')?.value
         if (!instanceNameTemplate) {
             instanceNameTemplate = param.resourcePoolName
@@ -102,6 +108,8 @@ class GCPProvision extends FlowPlugin {
             parameters.tags(tags)
         }
 
+        parameters.hostname(param.instanceHostname)
+
 
         if (param.keys) {
             List mapKeys = new JsonSlurper().parseText(param.keys)
@@ -121,6 +129,7 @@ class GCPProvision extends FlowPlugin {
             }
             parameters.keys(keys)
         }
+        parameters.deletionProtection(param.deletionProtection == "true")
 
         int count = Integer.parseInt(param.count)
         def operations = []
@@ -191,7 +200,11 @@ class GCPProvision extends FlowPlugin {
         for (String name in names) {
             def instance = gcp.getInstance(name)
             String internalIp = gcp.getInstanceInternalIp(name)
+            log.info "Instance $name has internal IP $internalIp"
             String externalIp = gcp.getInstanceExternalIp(name) ?: ""
+            if (externalIp) {
+                log.info "Instance $name has external IP $externalIp"
+            }
             details.put(name, [
                 internalIp: internalIp,
                 externalIp: externalIp,
@@ -388,37 +401,6 @@ class GCPProvision extends FlowPlugin {
         gcp.blockUntilComplete(operation, 60 * 1000)
     }
 
-/**
- * startInstance - Start Instance/Start Instance
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceName (required: true)
-
- */
-    def startInstance(StepParameters p, StepResult sr) {
-
-        /* Log is automatically available from the parent class */
-        log.info(
-            "startInstance was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
-
-        String name = p.getRequiredParameter('instanceName').value
-        def operation = gcp.stopInstance(name)
-        gcp.blockUntilComplete(operation, 60 * 1000)
-        def instance = gcp.getInstance(name)
-        def ip = gcp.getInstanceInternalIp(name)
-        def publicIp = gcp.getInstanceExternalIp(name)
-        log.info "Instance Public IP: $publicIp"
-        log.info "Instance privateIP: $ip"
-
-        sr.setOutputParameter('ip', ip)
-        sr.apply()
-
-        String resultProperty = p.getRequiredParameter('resultProperty').value
-        FlowAPI.setFlowProperty("$resultProperty/ip", ip)
-    }
 
 /**
  * listInstances - List Instances/List Instances
@@ -582,6 +564,77 @@ class GCPProvision extends FlowPlugin {
             gcp.blockUntilComplete(it, 300 * 1000)
             log.info "Operation ${it.getName()} has completed"
         }
+    }
+
+/**
+ * stopInstances - Stop Instances/Stop Instances
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param instanceNames (required: true)
+
+ */
+    def stopInstances(StepParameters p, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+            "stopInstances was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
+        )
+
+        String names = p.getRequiredParameter('instanceNames').value
+        def operations = []
+        def instanceNames = []
+        names.split(/[\s\n]+/).each {
+            def operation = gcp.stopInstance(it.trim())
+            log.info "Launched operation ${operation.getName()}"
+            operations << operation
+            instanceNames << it.trim()
+        }
+        operations.each {
+            gcp.blockUntilComplete(it, 300 * 1000)
+        }
+    }
+
+/**
+ * startInstances - Start Instances/Start Instances
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param instanceNames (required: true)
+ * @param resultProperty (required: true)
+
+ */
+    def startInstances(StepParameters p, StepResult sr) {
+        /* Log is automatically available from the parent class */
+        log.info(
+            "startInstances was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            p.toString()
+        )
+
+
+        String names = p.getRequiredParameter('instanceNames').value
+        def operations = []
+        def instanceNames = []
+        names.split(/[\s\n]+/).each {
+            def operation = gcp.startInstance(it.trim())
+            log.info "Launched operation ${operation.getName()}"
+            operations << operation
+            instanceNames << it.trim()
+        }
+        operations.each {
+            gcp.blockUntilComplete(it, 300 * 1000)
+        }
+
+        def instances = instanceNames.collect {
+            gcp.getInstance(it)
+        }
+        sr.setOutputParameter('instances', JsonOutput.toJson(instances))
+        sr.apply()
+        String prettyJson = new JsonBuilder(instances).toPrettyString()
+        log.info "Instances: $prettyJson"
+        String resultProperty = p.getRequiredParameter('resultProperty').value
+        FlowAPI.setFlowProperty("$resultProperty/json", prettyJson)
     }
 
 // === step ends ===

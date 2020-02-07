@@ -19,4 +19,6 @@ class ProvisionInstanceParameters {
     boolean assignPublicIp
     Image sourceImage
     String description
+    boolean deletionProtection
+    String hostname
 }

@@ -18,8 +18,8 @@ def pluginDir = getProperty("/projects/$pluginName/pluginDir").value
 def stepsWithAttachedCredentials = [
     [procedureName: "Delete Instances", stepName: "Delete Instances"],
     [procedureName: "Run Script", stepName: "Run Script"],
-    [procedureName: "Stop Instance", stepName: "Stop Instance"],
-    [procedureName: "Start Instance", stepName: "Start Instance"],
+    [procedureName: "Stop Instances", stepName: "Stop Instances"],
+    [procedureName: "Start Instances", stepName: "Start Instances"],
     [procedureName: "List Instances", stepName: "List Instances"],
     [procedureName: "Reset Instances", stepName: "Reset Instances"],
     [procedureName: "Provision", stepName: "Provision"],
@@ -236,7 +236,7 @@ value = 'resourcePoolName'
 def retainedProperties = []
 
 upgrade(upgradeAction, pluginName, otherPluginName, stepsWithAttachedCredentials, 'ec_plugin_cfgs', retainedProperties)
-// DO NOT EDIT THIS BLOCK === promote_autogen ends, checksum: 93d2b7d7114317186fb6809c14a172eb ===
+// DO NOT EDIT THIS BLOCK === promote_autogen ends, checksum: 1abc4587e14e22c1b71b8f206f228ef1 ===
 // Do not edit the code above this line
 
 project pluginName, {

@@ -1,4 +1,4 @@
 $[/myProject/groovy/scripts/preamble.groovy.ignore]
 
 GCPProvision plugin = new GCPProvision()
-plugin.runStep('Stop Instance', 'Stop Instance', 'stopInstance')
+plugin.runStep('Start Instances', 'Start Instances', 'startInstances')

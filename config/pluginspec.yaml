@@ -134,40 +134,54 @@ procedures:
       type: textarea
       label: Script
       required: true
-      documentation: Script to evaluate
-      value: println compute
+      documentation: |
+        Script to evaluate. The following variables are accessible:
+
+        compute - compute client
+        ef - ElectricFlow Groovy API client
+        zone - zone name from the configuration
+        project - project ID from the configuration
+        wrapper - Compute wrapper from this plugin
+
+        Both wrapper and compute clients are already initialized.
+
+      value: |
+        println "Compute raw client: $compute"
+        println "Project ID: $project"
+        println "Zone: $zone"
+        println "Flow Client: $ef"
+        println "Compute Wrapper: $wrapper"
 
   outputParameters:
     output: Some output parameter to use in the script
 
 
-- name: Stop Instance
+- name: Stop Instances
   hasConfig: true
-  description: Stops a GCP instance
+  description: Stops GCP instances
   parameters:
-    - name: instanceName
+    - name: instanceNames
       required: true
-      documentation: The name of the instance to stop
-      label: Instance Name
-      type: entry
+      documentation: Newline separated instance names
+      label: Instance Names
+      type: textarea
 
-- name: Start Instance
+- name: Start Instances
   hasConfig: true
-  description: Starts a GCP instance
+  description: Starts GCP instances
   parameters:
-    - name: instanceName
+    - name: instanceNames
+      type: textarea
       required: true
-      documentation: The name of the instance to start
-      label: Instance Name
-      type: entry
+      documentation: Newline separated instance names
+      label: Instance Names
     - name: resultProperty
       required: true
       value: '/myJob/result'
       type: entry
       label: Result Property Sheet
   outputParameters:
-    ip: Will be set to the instance ip
-
+    instances: JSON representation of instances
 
 - name: List Instances
   description: Lists instances for the provided parameters
@@ -216,17 +230,26 @@ procedures:
       type: textarea
       documentation: Newline-separated instance names
 
-  #
-#- name: Scale Pool
-#  hasConfig: false
-#  shell: ec-perl
+
+#- name: Update Instances
+#  hasConfig: true
+#  description: Updates instances parameters
 #  parameters:
-#    - name: poolName
+#    - name: instanceNames
+#      type: textarea
 #      required: true
-#    - name: max
-#      required: true
-#    - name: min
-#      required: true
+#      label: Instance Names
+#      documentation: Newline-separated instance names
+#    - name: networkTags
+#      type: textarea
+#      required: false
+#    - name: deletionProtection
+#      type: radio
+#      options:
+#        - name: retain
+#        - name: on
+#        - name: off
+
 -
   name: 'Provision'
   description: Creates one or few instances from the provided parameters
@@ -305,6 +328,17 @@ procedures:
     uncheckedValue: false
     label: Assign Public IP?
     documentation: If checked, the a NAT network interface will be attached to the instance.
+  - name: deletionProtection
+    type: checkbox
+    checkedValue: true
+    uncheckedValue: false
+    label: Protect from Deletion?
+    documentation: If checked, the instance will be protected from deletion.
+  - name: instanceHostname
+    type: entry
+    required: false
+    label: Hostname
+    documentation: Hostname for the instance
   - name: count
     required: true
     type: integer

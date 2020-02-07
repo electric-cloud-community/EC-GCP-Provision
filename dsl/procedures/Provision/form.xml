@@ -96,6 +96,21 @@
     <uncheckedValue>false</uncheckedValue>
   </formElement>
   <formElement>
+    <type>checkbox</type>
+    <property>deletionProtection</property>
+    <documentation>If checked, the instance will be protected from deletion.</documentation>
+    <label>Protect from Deletion?:</label>
+    <checkedValue>true</checkedValue>
+    <uncheckedValue>false</uncheckedValue>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>instanceHostname</property>
+    <required>0</required>
+    <documentation>Hostname for the instance</documentation>
+    <label>Hostname:</label>
+  </formElement>
+  <formElement>
     <type>integer</type>
     <property>count</property>
     <required>1</required>

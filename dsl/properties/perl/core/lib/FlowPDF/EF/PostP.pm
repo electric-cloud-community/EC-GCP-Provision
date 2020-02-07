@@ -44,6 +44,7 @@ sub run {
         if ($state eq 'seek') {
             ($terminator, $cutter, $matcher) = try_to_switch_mode($line);
             if ($terminator && $cutter) {
+                # print "Switching to accumulate\n";
                 $starting_line = $current_line;
                 $state = 'accumulate';
                 $line =~ s/$cutter//s;
