@@ -170,24 +170,38 @@ class GCPProvision extends FlowPlugin {
                     hostName: ip,
                     zoneName: zone
                 )
-                FlowAPI.ec.createAclEntry(
-                    principalType: 'user',
-                    principalName: "project: @PLUGIN_NAME@",
-                    modifyPrivilege: 'allow',
-                    readPrivilege: 'allow',
-                    changePermissionPrivilege: 'allow',
-                    executePrivilege: 'allow',
-                    resourceName: name
-                )
-                FlowAPI.ec.createAclEntry(
-                    principalType: 'user',
-                    principalName: '$[/myJob/launchedByUser]',
-                    modifyPrivilege: 'allow',
-                    readPrivilege: 'allow',
-                    changePermissionPrivilege: 'allow',
-                    executePrivilege: 'allow',
-                    resourceName: name
-                )
+                log.info "Created resource $name in zone $zone, pool $resourcePool"
+                String me = '$[/myJob/launchedByUser]'
+
+                try {
+                    FlowAPI.ec.createAclEntry(
+                        principalType: 'user',
+                        principalName: "project: @PLUGIN_NAME@",
+                        modifyPrivilege: 'allow',
+                        readPrivilege: 'allow',
+                        changePermissionPrivilege: 'allow',
+                        executePrivilege: 'allow',
+                        resourceName: name
+                    )
+                }
+                catch (Throwable e) {
+                    log.info("Failed to grant ACL for the principal project: @PLUGIN_NAME@ at the resource: ${e.message}")
+                }
+                try {
+
+
+                    FlowAPI.ec.createAclEntry(
+                        principalType: 'user',
+                        principalName: me,
+                        modifyPrivilege: 'allow',
+                        readPrivilege: 'allow',
+                        changePermissionPrivilege: 'allow',
+                        executePrivilege: 'allow',
+                        resourceName: name
+                    )
+                } catch (Throwable e) {
+                    log.info "Failed to grant ACL for $me: ${e.message}"
+                }
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/createdBy", "@PLUGIN_KEY@")
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/instance_id", name)
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/config", param.config)
