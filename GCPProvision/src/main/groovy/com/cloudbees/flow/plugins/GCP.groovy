@@ -11,6 +11,7 @@ import com.google.api.services.compute.Compute
 import com.google.api.services.compute.model.AccessConfig
 import com.google.api.services.compute.model.AttachedDisk
 import com.google.api.services.compute.model.AttachedDiskInitializeParams
+import com.google.api.services.compute.model.DeprecationStatus
 import com.google.api.services.compute.model.Image
 import com.google.api.services.compute.model.ImageList
 import com.google.api.services.compute.model.Instance
@@ -152,13 +153,20 @@ class GCP {
         }
 
         //// Initialize the service account to be used by the VM Instance and set the API access scopes.
-        ServiceAccount account = new ServiceAccount()
-        account.setEmail(getServiceAccountEmail())
-        List<String> scopes = new ArrayList<>()
-        scopes.add("https://www.googleapis.com/auth/devstorage.full_control")
-        scopes.add("https://www.googleapis.com/auth/compute")
-        account.setScopes(scopes)
-        instance.setServiceAccounts(Collections.singletonList(account))
+
+        if (p.serviceAccountType in [ServiceAccountType.DEFINED, ServiceAccountType.SAME]) {
+            ServiceAccount account = new ServiceAccount()
+            String email = ServiceAccountType.DEFINED ? p.serviceAccountEmail : getServiceAccountEmail()
+            if (!email) {
+                throw new RuntimeException("Service account email is not provided for the service account type ${p.serviceAccountType}")
+            }
+            account.setEmail(email)
+            List<String> scopes = new ArrayList<>()
+            scopes.add("https://www.googleapis.com/auth/devstorage.full_control")
+            scopes.add("https://www.googleapis.com/auth/compute")
+            account.setScopes(scopes)
+            instance.setServiceAccounts(Collections.singletonList(account))
+        }
 
 
         // Add attached Persistent Disk to be used by VM Instance.
@@ -262,20 +270,22 @@ class GCP {
         Image image = new Image()
         if (p.sourceImage) {
             image.setSourceImage(p.sourceImage)
-        }
-        else if (p.sourceDisk) {
+        } else if (p.sourceDisk) {
             image.setSourceDisk("/zones/$p.zone/disks/$p.sourceDisk")
-        }
-        else if (p.sourceSnapshot) {
+        } else if (p.sourceSnapshot) {
             image.setSourceSnapshot(p.sourceSnapshot)
-        }
-        else {
+        } else {
             throw new RuntimeException("Either source image, snapshot or disk must be provided")
         }
         if (p.family) {
             image.setFamily(p.family)
         }
         image.setDescription(p.description)
+
+        //DeprecationStatus deprecationStatus = new DeprecationStatus()
+        //deprecationStatus.setReplacement("")
+
+
         return null
     }
 

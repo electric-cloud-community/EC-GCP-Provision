@@ -21,4 +21,12 @@ class ProvisionInstanceParameters {
     String description
     boolean deletionProtection
     String hostname
+    String serviceAccountEmail
+    ServiceAccountType serviceAccountType
+}
+
+enum ServiceAccountType {
+    NO_ACCOUNT,
+    SAME,
+    DEFINED
 }

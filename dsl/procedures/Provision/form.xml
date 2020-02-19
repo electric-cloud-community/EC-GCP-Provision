@@ -96,6 +96,38 @@
     <uncheckedValue>false</uncheckedValue>
   </formElement>
   <formElement>
+    <type>radio</type>
+    <property>useServiceAccount</property>
+    <required>0</required>
+    <documentation>Which service account will be used by the provisioned machine. If same service account is chosen, the service account that
+is provided by the plugin configuration will be used. If another service account is chosen, the service account in the plugin configuration
+must have access to this service account.
+</documentation>
+    <label>Use Service Account:</label>
+    <option>
+      <name>No Service Account</name>
+      <value>noAccount</value>
+    </option>
+    <option>
+      <name>Same Service Account</name>
+      <value>sameAccount</value>
+    </option>
+    <option>
+      <name>Another Service Account</name>
+      <value>anotherAccount</value>
+    </option>
+    <value>noAccount</value>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>serviceAccountEmail</property>
+    <required>0</required>
+    <documentation>Service account email to use with the provisioned machine.</documentation>
+    <label>Service Account Email:</label>
+    <condition>${useServiceAccount == 'anotherAccount'}</condition>
+    <dependsOn>useServiceAccount</dependsOn>
+  </formElement>
+  <formElement>
     <type>checkbox</type>
     <property>deletionProtection</property>
     <documentation>If checked, the instance will be protected from deletion.</documentation>

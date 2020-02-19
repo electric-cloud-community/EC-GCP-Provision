@@ -95,12 +95,28 @@ class GCPProvision extends FlowPlugin {
             throw new RuntimeException("Either source image URL or family should be provided")
         }
 
+        if (param.useServiceAccount) {
+            if (param.useServiceAccount == 'noAccount') {
+                parameters.serviceAccountType(ServiceAccountType.NO_ACCOUNT)
+                log.info "No service account will be used"
+            } else if (param.useServiceAccount == 'sameAccount') {
+                parameters.serviceAccountType(ServiceAccountType.SAME)
+                log.info "The same service account will be used for the machine"
+            } else {
+                parameters.serviceAccountType(ServiceAccountType.DEFINED)
+                if (!param.serviceAccountEmail) {
+                    throw new RuntimeException("Service account email must be provided for the defined service account")
+                }
+                parameters.serviceAccountEmail(param.serviceAccountEmail)
+                log.info "Service account $param.serviceAccountEmail will be used for the machine"
+            }
+        }
+
         log.info "Using source image $param.sourceImage"
         parameters.network(param.network)
         log.info "Using network $param.network"
         parameters.subnetwork(param.subnetwork)
         log.info "Using subnetwork $param.subnetwork"
-
 
         if (param.instanceTags) {
             List<String> tags = param.instanceTags.split(/\s*\n+\s*/)
@@ -249,11 +265,11 @@ class GCPProvision extends FlowPlugin {
 
         def generator = { String alphabet, int n ->
             new Random().with {
-                (1..n).collect { alphabet[ nextInt( alphabet.length() ) ] }.join()
+                (1..n).collect { alphabet[nextInt(alphabet.length())] }.join()
             }
         }
 
-        def random = generator( (('a'..'z')+('0'..'9')).join(), 5)
+        def random = generator((('a'..'z') + ('0'..'9')).join(), 5)
 
         String instanceName = template
             .toLowerCase()

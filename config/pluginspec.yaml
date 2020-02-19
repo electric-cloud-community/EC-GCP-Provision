@@ -328,6 +328,30 @@ procedures:
     uncheckedValue: false
     label: Assign Public IP?
     documentation: If checked, the a NAT network interface will be attached to the instance.
+
+  - name: useServiceAccount
+    type: radio
+    required: false
+    options:
+      - name: No Service Account
+        value: noAccount
+      - name: Same Service Account
+        value: sameAccount
+      - name: Another Service Account
+        value: anotherAccount
+    value: noAccount
+    label: Use Service Account
+    documentation: |
+      Which service account will be used by the provisioned machine. If same service account is chosen, the service account that
+      is provided by the plugin configuration will be used. If another service account is chosen, the service account in the plugin configuration
+      must have access to this service account.
+  - name: serviceAccountEmail
+    label: Service Account Email
+    dependsOn: useServiceAccount
+    condition: ${useServiceAccount == 'anotherAccount'}
+    type: entry
+    required: false
+    documentation: Service account email to use with the provisioned machine.
   - name: deletionProtection
     type: checkbox
     checkedValue: true
