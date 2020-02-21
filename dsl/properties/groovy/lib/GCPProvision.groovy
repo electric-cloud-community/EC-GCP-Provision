@@ -629,8 +629,15 @@ class GCPProvision extends FlowPlugin {
             operations << operation
             instanceNames << it.trim()
         }
+
+        int timeout = -1
+        def timeoutString = p.getParameter('timeout')?.value
+        if (timeoutString) {
+            timeout = timeoutString as int
+        }
+
         operations.each {
-            gcp.blockUntilComplete(it, 300 * 1000)
+            gcp.blockUntilComplete(it, timeout * 1000)
         }
     }
 
@@ -675,6 +682,61 @@ class GCPProvision extends FlowPlugin {
         FlowAPI.setFlowProperty("$resultProperty/json", prettyJson)
     }
 
+/**
+ * createImage - Create Image/Create Image
+ * Add your code into this method and it will be called when the step runs
+ * @param config (required: true)
+ * @param family (required: false)
+ * @param name (required: false)
+ * @param source (required: )
+ * @param sourceDisk (required: false)
+ * @param zone (required: false)
+ * @param sourceSnapshot (required: false)
+ * @param sourceImage (required: false)
+ * @param description (required: false)
+ * @param diskSizeGb (required: false)
+ * @param deprecateOld (required: )
+
+ */
+    def createImage(StepParameters parameters, StepResult sr) {
+
+        /* Log is automatically available from the parent class */
+        log.info(
+            "createImage was invoked with StepParameters",
+            /* runtimeParameters contains both configuration and procedure parameters */
+            parameters.toString()
+        )
+
+        Map<String, String> p = parameters.asMap
+        CreateImageParameters createImageParameters = CreateImageParameters
+            .builder()
+            .family(p.family)
+            .name(p.name)
+            .sourceImage(p.sourceImage)
+            .sourceDisk(p.sourceDisk)
+            .sourceSnapshot(p.sourceSnapshot)
+            .zone(p.diskZone)
+            .description(p.description)
+            .diskSizeGb(p.diskSizeGb as long)
+            .forceCreate(checked(p.forceCreate))
+            .locations(p.locations?.split(/[\s\n]+/) as List<String>)
+            .build()
+
+        def oldImage
+        if (p.family) {
+            oldImage = gcp.getFromFamily(gcp.projectId, p.family)
+        }
+        def create = gcp.createImage(createImageParameters)
+        gcp.blockUntilComplete(create.get(0), -1)
+
+        if (checked(p.deprecateOld) && oldImage) {
+            log.info "Deprecating old image ${oldImage.getName()}"
+            String replacement = "projects/${gcp.projectId}/global/images/${create.get(1).getName()}"
+            def deprecate = gcp.deprecateImage(oldImage.getName(), replacement)
+            gcp.blockUntilComplete(deprecate, -1)
+        }
+    }
+
 // === step ends ===
 
     String getRuntimeLink() {
@@ -683,6 +745,9 @@ class GCPProvision extends FlowPlugin {
         return 'http://$[/server/webServerHost]' + link
     }
 
+    static boolean checked(String value) {
+        return value == "true"
+    }
 }
 
 

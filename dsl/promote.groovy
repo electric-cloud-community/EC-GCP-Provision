@@ -23,6 +23,7 @@ def stepsWithAttachedCredentials = [
     [procedureName: "List Instances", stepName: "List Instances"],
     [procedureName: "Reset Instances", stepName: "Reset Instances"],
     [procedureName: "Provision", stepName: "Provision"],
+    [procedureName: "Create Image", stepName: "Create Image"],
 
 ]
 
@@ -236,7 +237,7 @@ value = 'resourcePoolName'
 def retainedProperties = []
 
 upgrade(upgradeAction, pluginName, otherPluginName, stepsWithAttachedCredentials, 'ec_plugin_cfgs', retainedProperties)
-// DO NOT EDIT THIS BLOCK === promote_autogen ends, checksum: 1abc4587e14e22c1b71b8f206f228ef1 ===
+// DO NOT EDIT THIS BLOCK === promote_autogen ends, checksum: 6f9b04d29739602ffc899f46d52f0e35 ===
 // Do not edit the code above this line
 
 project pluginName, {

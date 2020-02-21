@@ -165,6 +165,12 @@ procedures:
       documentation: Newline separated instance names
       label: Instance Names
       type: textarea
+    - name: timeout
+      required: false
+      value: -1
+      label: Timeout
+      type: integer
+      documentation: Timeout in seconds to wait for the instances to stop. -1 means no timeout.
 
 - name: Start Instances
   hasConfig: true
@@ -407,3 +413,89 @@ procedures:
     required: false
     documentation: Property sheet to store instance result
     label: Result Property
+
+- name: Create Image
+  hasConfig: true
+  description: Creates a new image
+  parameters:
+    - name: family
+      type: entry
+      required: false
+      label: Family
+      documentation: |
+        Image family for the new image. If the image name is not provided the new image name will be calculate from the
+        family name. Either image name or a family name must be provided.
+    - name: name
+      required: false
+      label: Name
+      documentation: |
+        Name for the new image. If the name is not provided, the family must be provided and the
+        image name will be calculated from the family name.
+        Either image name or a family name must be provided.
+    - name: source
+      type: radio
+      label: Source
+      options:
+        - name: Source Disk
+          value: sourceDisk
+        - name: Source Snapshot
+          value: sourceSnapshot
+        - name: Source Image
+          value: sourceImage
+      value: sourceDisk
+    - name: sourceDisk
+      type: entry
+      required: false
+      label: Source Disk
+      dependsOn: source
+      condition: ${source == 'sourceDisk'}
+      documentation: Source disk name for the image.
+    - name: diskZone
+      required: false
+      documentation: Zone for the source disk if the source disk is used.
+      dependsOn: source
+      condition: ${source == 'sourceDisk'}
+    - name: sourceSnapshot
+      type: entry
+      required: false
+      label: Source Snapshot
+      dependsOn: source
+      condition: ${source == 'sourceSnapshot'}
+      documentation: Snapshot for the source image.
+    - name: sourceImage
+      type: entry
+      required: false
+      documentation: Source image name
+      dependsOn: source
+      label: Source Image
+      condition: ${source == 'sourceImage'}
+    - name: description
+      label: Description
+      documentation: Description for the new image.
+      required: false
+      type: textarea
+    - name: diskSizeGb
+      label: Disk Size (GB)
+      type: integer
+      required: false
+      documentation: Disk size in GB
+    - name: deprecateOld
+      type: checkbox
+      checkedValue: true
+      uncheckedValue: false
+      label: Deprecate Old Image?
+      value: false
+      documentation: If checked, the old image from the same family will be deprecated and replaced with the new image
+    - name: forceCreate
+      type: checkbox
+      checkedValue: true
+      uncheckedValue: false
+      value: false
+      label: Force Create?
+      documentation: |
+        If checked, the image will be created if the disk is in use by a running instance.
+    - name: locations
+      type: textarea
+      label: Locations
+      required: false
+      documentation: Space or newline-separated zone names for the new image. By default the new image will be multi-zonal.

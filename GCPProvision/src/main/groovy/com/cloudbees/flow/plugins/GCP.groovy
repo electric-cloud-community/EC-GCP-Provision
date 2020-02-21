@@ -23,7 +23,9 @@ import com.google.api.services.compute.model.Tags
 import com.google.api.services.compute.model.Metadata
 import com.google.api.services.compute.model.NetworkInterface
 import groovy.json.JsonSlurper
+import groovy.util.logging.Slf4j
 
+@Slf4j
 class GCP {
 
     Compute compute
@@ -266,27 +268,70 @@ class GCP {
     }
 
 
-    Operation createImage(CreateImageParameters p) {
+    Tuple createImage(CreateImageParameters p) {
         Image image = new Image()
         if (p.sourceImage) {
             image.setSourceImage(p.sourceImage)
+            log.info "Using source image ${image.getSourceImage()}"
         } else if (p.sourceDisk) {
-            image.setSourceDisk("/zones/$p.zone/disks/$p.sourceDisk")
+            log.info "Zone is $p.zone"
+            if (!p.zone) {
+                log.info "Using zone from the configuration ${zone}"
+            }
+            String zoneName = p.zone ? p.zone : this.zone
+            image.setSourceDisk("/zones/$zoneName/disks/$p.sourceDisk")
+            log.info "Using image source disk ${image.getSourceDisk()}"
         } else if (p.sourceSnapshot) {
             image.setSourceSnapshot(p.sourceSnapshot)
+            log.info "Using image source snapshot ${image.getSourceSnapshot()}"
         } else {
             throw new RuntimeException("Either source image, snapshot or disk must be provided")
         }
+
+        if (p.locations) {
+            image.setStorageLocations(p.locations)
+            log.info "Using locations ${p.locations}"
+        }
         if (p.family) {
             image.setFamily(p.family)
+            log.info "Using image family ${image.getFamily()}"
         }
         image.setDescription(p.description)
+        if (p.diskSizeGb) {
+            image.setDiskSizeGb(p.diskSizeGb)
+            log.info "Using image disk size ${image.getDiskSizeGb()}"
+        }
 
-        //DeprecationStatus deprecationStatus = new DeprecationStatus()
-        //deprecationStatus.setReplacement("")
+        if (p.name) {
+            image.setName(p.name)
+        } else if (p.family) {
+            String dateSuffix = new Date().format("yyyyMMdd")
+            List<Image> family = compute.images().list(projectId).setFilter("family = ${p.family}").execute().getItems()
+            String name = p.family + '-' + dateSuffix
+            List<Image> duplicates = family.findAll {
+                it.getName().startsWith(name)
+            }
+            int counter = duplicates.size()
+            log.info "Found $counter images in the family for the same date"
+            if (counter > 0) {
+                name += "-" + counter
+            }
+            image.setName(name)
+        } else {
+            throw new RuntimeException("Either image name or a family name must be provided")
+        }
+        log.info("Using image name ${image.getName()}")
 
+        Operation insert = compute.images().insert(projectId, image).setForceCreate(p.forceCreate).execute()
+        return new Tuple(insert, image)
+    }
 
-        return null
+    Operation deprecateImage(String name, String replacement) {
+        DeprecationStatus deprecationStatus = new DeprecationStatus()
+        deprecationStatus.setReplacement(replacement)
+        deprecationStatus.setState("DEPRECATED")
+        Operation deprecate = compute.images().deprecate(projectId, name, deprecationStatus).execute()
+        return deprecate
     }
 
     Operation resetInstance(String name) {
@@ -306,7 +351,7 @@ class GCP {
         while (operation != null && !status.equals("DONE")) {
             Thread.sleep(pollInterval);
             long elapsed = System.currentTimeMillis() - start;
-            if (elapsed >= timeout) {
+            if (timeout > 0 && elapsed >= timeout) {
                 throw new InterruptedException("Timed out waiting for operation to complete");
             }
             println "Waiting...."

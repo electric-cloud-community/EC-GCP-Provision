@@ -1,0 +1,128 @@
+<!--
+    This form is generated automatically from the parameters pluginspec.
+    Please not not edit this file manually as it will be regenerated.
+-->
+<editor>
+  <help>/commander/pages/@PLUGIN_NAME@/help?s=Administration&amp;ss=Plugins#CreateImage</help>
+  <formElement>
+    <type>entry</type>
+    <property>config</property>
+    <configuration>1</configuration>
+    <propertyReference>/plugins/@PLUGIN_NAME@/project/ec_plugin_cfgs</propertyReference>
+    <required>1</required>
+    <documentation>Previously defined configuration for the plugin</documentation>
+    <label>Configuration Name:</label>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>family</property>
+    <required>0</required>
+    <documentation>Image family for the new image. If the image name is not provided the new image name will be calculate from the
+family name. Either image name or a family name must be provided.
+</documentation>
+    <label>Family:</label>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>name</property>
+    <required>0</required>
+    <documentation>Name for the new image. If the name is not provided, the family must be provided and the
+image name will be calculated from the family name.
+Either image name or a family name must be provided.
+</documentation>
+    <label>Name:</label>
+  </formElement>
+  <formElement>
+    <type>radio</type>
+    <property>source</property>
+    <label>Source:</label>
+    <option>
+      <name>Source Disk</name>
+      <value>sourceDisk</value>
+    </option>
+    <option>
+      <name>Source Snapshot</name>
+      <value>sourceSnapshot</value>
+    </option>
+    <option>
+      <name>Source Image</name>
+      <value>sourceImage</value>
+    </option>
+    <value>sourceDisk</value>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>sourceDisk</property>
+    <required>0</required>
+    <documentation>Source disk name for the image.</documentation>
+    <label>Source Disk:</label>
+    <condition>${source == 'sourceDisk'}</condition>
+    <dependsOn>source</dependsOn>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>diskZone</property>
+    <required>0</required>
+    <documentation>Zone for the source disk if the source disk is used.</documentation>
+    <condition>${source == 'sourceDisk'}</condition>
+    <dependsOn>source</dependsOn>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>sourceSnapshot</property>
+    <required>0</required>
+    <documentation>Snapshot for the source image.</documentation>
+    <label>Source Snapshot:</label>
+    <condition>${source == 'sourceSnapshot'}</condition>
+    <dependsOn>source</dependsOn>
+  </formElement>
+  <formElement>
+    <type>entry</type>
+    <property>sourceImage</property>
+    <required>0</required>
+    <documentation>Source image name</documentation>
+    <label>Source Image:</label>
+    <condition>${source == 'sourceImage'}</condition>
+    <dependsOn>source</dependsOn>
+  </formElement>
+  <formElement>
+    <type>textarea</type>
+    <property>description</property>
+    <required>0</required>
+    <documentation>Description for the new image.</documentation>
+    <label>Description:</label>
+  </formElement>
+  <formElement>
+    <type>integer</type>
+    <property>diskSizeGb</property>
+    <required>0</required>
+    <documentation>Disk size in GB</documentation>
+    <label>Disk Size (GB):</label>
+  </formElement>
+  <formElement>
+    <type>checkbox</type>
+    <property>deprecateOld</property>
+    <documentation>If checked, the old image from the same family will be deprecated and replaced with the new image</documentation>
+    <label>Deprecate Old Image?:</label>
+    <value>false</value>
+    <checkedValue>true</checkedValue>
+    <uncheckedValue>false</uncheckedValue>
+  </formElement>
+  <formElement>
+    <type>checkbox</type>
+    <property>forceCreate</property>
+    <documentation>If checked, the image will be created if the disk is in use by a running instance.
+</documentation>
+    <label>Force Create?:</label>
+    <value>false</value>
+    <checkedValue>true</checkedValue>
+    <uncheckedValue>false</uncheckedValue>
+  </formElement>
+  <formElement>
+    <type>textarea</type>
+    <property>locations</property>
+    <required>0</required>
+    <documentation>Space or newline-separated zone names for the new image. By default the new image will be multi-zonal.</documentation>
+    <label>Locations:</label>
+  </formElement>
+</editor>
