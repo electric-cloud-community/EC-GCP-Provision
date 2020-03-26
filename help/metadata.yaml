@@ -1,0 +1,14 @@
+excludeProcedures:
+  - flowpdkSetup
+proceduresOrder:
+  - Create Image
+  - Start Instances
+  - Provision
+  - List Instances
+  - Run Script
+  - Delete Instances
+  - Reset Instances
+  - Stop Instances
+  - Teardown
+knownIssues: |
+  NA

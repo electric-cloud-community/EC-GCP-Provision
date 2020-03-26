@@ -230,6 +230,7 @@ procedures:
 
 - name: Reset Instances
   hasConfig: true
+  description: Reset GCP instances
   parameters:
     - name: instanceNames
       required: true
@@ -334,7 +335,6 @@ procedures:
     uncheckedValue: false
     label: Assign Public IP?
     documentation: If checked, the a NAT network interface will be attached to the instance.
-
   - name: useServiceAccount
     type: radio
     required: false

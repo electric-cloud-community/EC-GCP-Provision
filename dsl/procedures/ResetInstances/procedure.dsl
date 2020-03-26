@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Reset Instances', description: '''''', {
+procedure 'Reset Instances', description: '''Reset GCP instances''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -21,7 +21,7 @@ procedure 'Reset Instances', description: '''''', {
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 5aca37fba45b8a3b6b3abde57d0f629a ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 8b8fe00e032ad3a02443252faa4629c8 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

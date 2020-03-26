@@ -98,7 +98,7 @@ A generic runtime exception.
 
 We strongly recommend to use Try::Tiny for exceptions handling because eval {} approach has a lot of flaws.
 
-Pne of them is that exception, that was raised during eval {} is automatically being assigned to global variable $@.
+One of them is that exception, that was raised during eval {} is automatically being assigned to global variable $@.
 There are too many things that could go wrong. Try::Tiny is available in ec-perl.
 
 For example:

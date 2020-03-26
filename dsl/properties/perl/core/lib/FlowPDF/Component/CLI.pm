@@ -179,7 +179,11 @@ sub _syscall {
         stdout => '',
         stderr => '',
         code => $? >> 8,
+        errmsg => '',
     };
+    if ($!) {
+        $retval->{errmsg} = "$!";
+    }
 
     open (my $stderr, "$result_folder/$stderr_filename") or croak "Can't open stderr file ($stderr_filename) : $!";
     open (my $stdout, "$result_folder/$stdout_filename") or croak "Can't open stdout file ($stdout_filename) : $!";
