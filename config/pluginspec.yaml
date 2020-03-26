@@ -92,11 +92,14 @@ properties:
 procedures:
 
 - name: Teardown
-  description: Deletes machines from the pool or the specified resource
+  description: Deletes machines from the resource pool or the specified resource
   hasConfig: false
   parameters:
     - name: resName
       required: true
+      type: textarea
+      label: Resource name or pool name
+      documentation: Flow resource name or pool name
 
 - name: Delete Instances
   description: Destroys GCP machines

@@ -5,8 +5,10 @@
 <editor>
   <help>/commander/pages/@PLUGIN_NAME@/help?s=Administration&amp;ss=Plugins#Teardown</help>
   <formElement>
-    <type>entry</type>
+    <type>textarea</type>
     <property>resName</property>
     <required>1</required>
+    <documentation>Flow resource name or pool name</documentation>
+    <label>Flow resource name or pool name:</label>
   </formElement>
 </editor>

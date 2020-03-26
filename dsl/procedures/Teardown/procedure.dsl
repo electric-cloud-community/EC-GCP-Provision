@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Teardown', description: '''Deletes machines from the pool or the specified resource''', {
+procedure 'Teardown', description: '''Deletes machines from the resource pool or the specified resource''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -21,7 +21,7 @@ procedure 'Teardown', description: '''Deletes machines from the pool or the spec
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: d1b5a268c436e6e070a79bd70844a49c ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: ed7c6bbb5af16444edc6902e21a1f7b6 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

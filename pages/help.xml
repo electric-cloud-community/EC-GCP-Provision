@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on Mar 26, 2020</p>
+    <p>Revised on Mar 27, 2020</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -881,7 +881,7 @@ Both wrapper and compute clients are already initialized.
         <h2>Teardown</h2>
         
         
-        <p>Deletes machines from the pool or the specified resource</p>
+        <p>Deletes machines from the resource pool or the specified resource</p>
         
         
         <h3>Teardown Parameters</h3>
@@ -896,8 +896,8 @@ Both wrapper and compute clients are already initialized.
             
             <tr>
                 
-                <td class="required"></td>
-                <td></td>
+                <td class="required">Flow resource name or pool name</td>
+                <td>Flow resource name or pool name</td>
                 
             </tr>
             
