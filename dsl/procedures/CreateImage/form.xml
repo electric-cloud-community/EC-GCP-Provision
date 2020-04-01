@@ -17,24 +17,32 @@
     <type>entry</type>
     <property>family</property>
     <required>0</required>
-    <documentation>Image family for the new image. If the image name is not provided the new image name will be calculate from the
-family name. Either image name or a family name must be provided.
-</documentation>
+    <htmlDocumentation>Name of the Image family.<br/>
+Either image family name or image name should be provided.<br/>
+If the image name is not provided, it will be calculated from the family name.
+</htmlDocumentation>
     <label>Family:</label>
   </formElement>
   <formElement>
     <type>entry</type>
     <property>name</property>
     <required>0</required>
-    <documentation>Name for the new image. If the name is not provided, the family must be provided and the
-image name will be calculated from the family name.
-Either image name or a family name must be provided.
-</documentation>
+    <htmlDocumentation>Name of the image.<br/>
+Either image family name or image name should be provided.<br/>
+If the image name is not provided, it will be calculated from the family name.
+</htmlDocumentation>
     <label>Name:</label>
   </formElement>
   <formElement>
     <type>radio</type>
     <property>source</property>
+    <htmlDocumentation>Source from which Image is created. It should be one of the following:
+<ul>
+<li>Source Disk</li>
+<li>Source Snapshot</li>
+<li>Source Image</li>
+</ul>
+</htmlDocumentation>
     <label>Source:</label>
     <option>
       <name>Source Disk</name>
@@ -54,7 +62,7 @@ Either image name or a family name must be provided.
     <type>entry</type>
     <property>sourceDisk</property>
     <required>0</required>
-    <documentation>Source disk name for the image.</documentation>
+    <documentation>Name of the Source Disk.</documentation>
     <label>Source Disk:</label>
     <condition>${source == 'sourceDisk'}</condition>
     <dependsOn>source</dependsOn>
@@ -63,7 +71,9 @@ Either image name or a family name must be provided.
     <type>entry</type>
     <property>diskZone</property>
     <required>0</required>
-    <documentation>Zone for the source disk if the source disk is used.</documentation>
+    <htmlDocumentation>Zone of the Source Disk.<br/>
+If Source Disk is chosen, this field should be specified.
+</htmlDocumentation>
     <condition>${source == 'sourceDisk'}</condition>
     <dependsOn>source</dependsOn>
   </formElement>
@@ -80,7 +90,7 @@ Either image name or a family name must be provided.
     <type>entry</type>
     <property>sourceImage</property>
     <required>0</required>
-    <documentation>Source image name</documentation>
+    <documentation>Name of the Source image.</documentation>
     <label>Source Image:</label>
     <condition>${source == 'sourceImage'}</condition>
     <dependsOn>source</dependsOn>
@@ -111,8 +121,7 @@ Either image name or a family name must be provided.
   <formElement>
     <type>checkbox</type>
     <property>forceCreate</property>
-    <documentation>If checked, the image will be created if the disk is in use by a running instance.
-</documentation>
+    <documentation>If checked, the image will be created even if the disk is in use by a running instance.</documentation>
     <label>Force Create?:</label>
     <value>false</value>
     <checkedValue>true</checkedValue>

@@ -23,7 +23,7 @@
     <type>entry</type>
     <property>projectId</property>
     <required>1</required>
-    <documentation>Project ID for the main project</documentation>
+    <documentation>Project ID of the project in GCP under which Instances are provisioned.</documentation>
     <label>Project Id:</label>
   </formElement>
   <formElement>
@@ -37,7 +37,21 @@
     <type>credential</type>
     <property>credential</property>
     <required>1</required>
-    <documentation>Service account key in JSON format</documentation>
+    <documentation>Service account key in JSON format. For example,
+
+{
+  "type": "service_account",
+  "project_id": "&lt;project id&gt;",
+  "private_key_id": "&lt;private key id&gt;",
+  "private_key": "-----BEGIN PRIVATE KEY-----&lt;private key content&gt;-----END PRIVATE KEY-----\n",
+  "client_email": "&lt;service account name&gt;@&lt;project id&gt;.iam.gserviceaccount.com",
+  "client_id": "&lt;client id&gt;",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/&lt;account id&gt;"
+}
+</documentation>
     <label>Credential:</label>
     <attachedAsParameterToStep>createConfiguration,checkConnection</attachedAsParameterToStep>
     <credentialType>key</credentialType>

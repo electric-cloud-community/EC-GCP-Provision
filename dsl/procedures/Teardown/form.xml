@@ -9,6 +9,6 @@
     <property>resName</property>
     <required>1</required>
     <documentation>Flow resource name or pool name</documentation>
-    <label>Flow resource name or pool name:</label>
+    <label>Resource name or pool name:</label>
   </formElement>
 </editor>

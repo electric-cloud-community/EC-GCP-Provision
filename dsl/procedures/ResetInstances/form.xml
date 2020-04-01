@@ -17,6 +17,8 @@
     <type>textarea</type>
     <property>instanceNames</property>
     <required>1</required>
-    <documentation>Newline-separated instance names</documentation>
+    <htmlDocumentation>Instance name.<br/>
+In case of multiple instances, specify one instance name per line.
+</htmlDocumentation>
   </formElement>
 </editor>

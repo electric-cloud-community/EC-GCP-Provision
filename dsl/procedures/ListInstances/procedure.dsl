@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'List Instances', description: '''Lists instances for the provided parameters''', {
+procedure 'List Instances', description: '''List Virtual Machine instances in GCP.''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -23,8 +23,8 @@ procedure 'List Instances', description: '''Lists instances for the provided par
     }
 
     formalOutputParameter 'instances',
-        description: 'JSON representation of instances found'
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: b4ca8c0393f9b372d112b472f6c46fee ===
+        description: 'JSON representation of instances found.'
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 039524269f5670f4db3ae046feb2b1ae ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

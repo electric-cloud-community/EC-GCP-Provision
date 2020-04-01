@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Create Image', description: '''Creates a new image''', {
+procedure 'Create Image', description: '''Creates a new Virtual Machine image in GCP''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -21,7 +21,7 @@ procedure 'Create Image', description: '''Creates a new image''', {
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 43a24d5bb5c53b8a7eb0654111a12752 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: ee787c6e5b971af4b4d01b20c9ffdf76 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

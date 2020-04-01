@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on Mar 27, 2020</p>
+    <p>Revised on April 01, 2020</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -146,7 +146,7 @@
             <tr>
                 
                     <td class="required">Project Id</td>
-                    <td>Project ID for the main project</td>
+                    <td>Project ID of the project in GCP under which Instances are provisioned.</td>
                 
             </tr>
             
@@ -160,7 +160,21 @@
             <tr>
                 
                     <td class="required">Credential</td>
-                    <td>Service account key in JSON format</td>
+                    <td>Service account key in JSON format. For example,
+
+{
+  "type": "service_account",
+  "project_id": "<project id>",
+  "private_key_id": "<private key id>",
+  "private_key": "-----BEGIN PRIVATE KEY-----<private key content>-----END PRIVATE KEY-----\n",
+  "client_email": "<service account name>@<project id>.iam.gserviceaccount.com",
+  "client_id": "<client id>",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/<account id>"
+}
+</td>
                 
             </tr>
             
@@ -195,7 +209,7 @@
         <h2>Create Image</h2>
         
         
-        <p>Creates a new image</p>
+        <p>Creates a new Virtual Machine image in GCP</p>
         
         
         <h3>Create Image Parameters</h3>
@@ -218,8 +232,9 @@
             <tr>
                 
                 <td >Family</td>
-                <td>Image family for the new image. If the image name is not provided the new image name will be calculate from the
-family name. Either image name or a family name must be provided.
+                <td>Name of the Image family.<br/>
+Either image family name or image name should be provided.<br/>
+If the image name is not provided, it will be calculated from the family name.
 </td>
                 
             </tr>
@@ -227,9 +242,9 @@ family name. Either image name or a family name must be provided.
             <tr>
                 
                 <td >Name</td>
-                <td>Name for the new image. If the name is not provided, the family must be provided and the
-image name will be calculated from the family name.
-Either image name or a family name must be provided.
+                <td>Name of the image.<br/>
+Either image family name or image name should be provided.<br/>
+If the image name is not provided, it will be calculated from the family name.
 </td>
                 
             </tr>
@@ -237,21 +252,24 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td >Source</td>
-                <td></td>
+                <td>Source from which Image is created. It should be one of the following:
+<ul><li>Source Disk</li><li>Source Snapshot</li><li>Source Image</li></ul></td>
                 
             </tr>
             
             <tr>
                 
                 <td >Source Disk</td>
-                <td>Source disk name for the image.</td>
+                <td>Name of the Source Disk.</td>
                 
             </tr>
             
             <tr>
                 
                 <td ></td>
-                <td>Zone for the source disk if the source disk is used.</td>
+                <td>Zone of the Source Disk.<br/>
+If Source Disk is chosen, this field should be specified.
+</td>
                 
             </tr>
             
@@ -265,7 +283,7 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td >Source Image</td>
-                <td>Source image name</td>
+                <td>Name of the Source image.</td>
                 
             </tr>
             
@@ -293,8 +311,7 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td >Force Create?</td>
-                <td>If checked, the image will be created if the disk is in use by a running instance.
-</td>
+                <td>If checked, the image will be created even if the disk is in use by a running instance.</td>
                 
             </tr>
             
@@ -318,7 +335,7 @@ Either image name or a family name must be provided.
         <h2>Start Instances</h2>
         
         
-        <p>Starts GCP instances</p>
+        <p>Starts one or more Virtual Machine Instances in GCP.</p>
         
         
         <h3>Start Instances Parameters</h3>
@@ -341,14 +358,17 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td class="required">Instance Names</td>
-                <td>Newline separated instance names</td>
+                <td>Instance name.<br/>
+In case of multiple instances, specify one instance name per line.
+</td>
                 
             </tr>
             
             <tr>
                 
                 <td class="required">Result Property Sheet</td>
-                <td></td>
+                <td>Property Sheet to store instances that are started in JSON format.
+</td>
                 
             </tr>
             
@@ -383,7 +403,7 @@ Either image name or a family name must be provided.
         <h2>Provision</h2>
         
         
-        <p>Creates one or few instances from the provided parameters</p>
+        <p>Creates one or more Virtual Machine instances.</p>
         
         
         <h3>Provision Parameters</h3>
@@ -406,7 +426,9 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td >Instance Name Template</td>
-                <td>Template for instance name, e.g. my-instance-1. The instance name will be generated by adding a random number to the end of this template.</td>
+                <td>Name of the instance template e.g. my-instance-1.<br/>
+The instance name is typically generated by adding a random string to the end of this name.
+</td>
                 
             </tr>
             
@@ -420,21 +442,27 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td >Source Image</td>
-                <td>Source image starting with a project name, e.g. my-project/global/images/image-name. Either URL or family should be provided.</td>
+                <td>Source image starting with a project name, e.g. my-project/global/images/image-name.<br/>
+Either URL or family should be provided.
+</td>
                 
             </tr>
             
             <tr>
                 
                 <td >Source Image Project</td>
-                <td>Source image project. If not set, the project from the configuration will be used.</td>
+                <td>Project to which Source Image belongs.<br/>
+If not specified, the project from the configuration will be used.
+</td>
                 
             </tr>
             
             <tr>
                 
                 <td >Source Image Family</td>
-                <td>Source image family. Either family or URL should be provided.</td>
+                <td>Source Image family.<br/>
+Either the family or a URL should be provided.
+</td>
                 
             </tr>
             
@@ -449,14 +477,14 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td class="required">Network</td>
-                <td>The name of VPC network, e.g. default</td>
+                <td>The name of the VPC network, e.g. default.</td>
                 
             </tr>
             
             <tr>
                 
                 <td class="required">Subnetwork</td>
-                <td>The name of VPC subnetwork</td>
+                <td>The name of the VPC subnetwork</td>
                 
             </tr>
             
@@ -477,17 +505,15 @@ Either image name or a family name must be provided.
             <tr>
                 
                 <td >Assign Public IP?</td>
-                <td>If checked, the a NAT network interface will be attached to the instance.</td>
+                <td>If checked, a NAT network interface will be attached to the instance.</td>
                 
             </tr>
             
             <tr>
                 
                 <td >Use Service Account</td>
-                <td>Which service account will be used by the provisioned machine. If same service account is chosen, the service account that
-is provided by the plugin configuration will be used. If another service account is chosen, the service account in the plugin configuration
-must have access to this service account.
-</td>
+                <td>If specified, the Service Account used to provision the virtual machine.
+Options are as follows.<br/><br/><ul><li>None - No Service Account is used.</li><li>Same - Use the Service Account as in the plugin configuration.</li><li>Another - Use the Service account as specified in the Service Account email field. In this case the expectation is that the Service Account used in the plugin configuration has privileges to access this other service account.</li></ul></td>
                 
             </tr>
             
@@ -522,14 +548,16 @@ must have access to this service account.
             <tr>
                 
                 <td >Timeout in Seconds</td>
-                <td>Time to wait for the operation to finish (in seconds). Please note that the resource availability is NOT checked.</td>
+                <td>If specified, time to wait for provisioning to finish (in seconds).<br/>
+Note that resource availability is not checked during the time out period.
+</td>
                 
             </tr>
             
             <tr>
                 
                 <td >Resource Pool Name</td>
-                <td>If provided, a resource will be created for the instance and placed into this pool.</td>
+                <td>If specified, the resource will be created for the instance and placed into this pool.</td>
                 
             </tr>
             
@@ -543,7 +571,7 @@ must have access to this service account.
             <tr>
                 
                 <td >Resource Workspace</td>
-                <td>Workspace name for the resource.</td>
+                <td>Workspace name for the created resource.</td>
                 
             </tr>
             
@@ -557,7 +585,7 @@ must have access to this service account.
             <tr>
                 
                 <td >Result Property</td>
-                <td>Property sheet to store instance result</td>
+                <td>Property sheet to store instance result.</td>
                 
             </tr>
             
@@ -577,7 +605,7 @@ must have access to this service account.
             
             <tr>
                 <td>instanceDetails</td>
-                <td>Details for the created instances</td>
+                <td>Details of the Instance created.</td>
             </tr>
             
             </tbody>
@@ -592,7 +620,7 @@ must have access to this service account.
         <h2>List Instances</h2>
         
         
-        <p>Lists instances for the provided parameters</p>
+        <p>List Virtual Machine instances in GCP.</p>
         
         
         <h3>List Instances Parameters</h3>
@@ -615,9 +643,10 @@ must have access to this service account.
             <tr>
                 
                 <td >Filter</td>
-                <td>A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, &gt;, or &lt;.
-
-For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
+                <td>Filter expression used to filter resources. The filter expression must specify the field name,
+a comparison operator, and the value used to filter them.<br/><br/>
+The value must be a string, a number, or a boolean and the comparison operator must be either =, !=, &gt;, or &lt;.<br/>
+For example, name != foobar-instance will exclude all Virtual Instances named foobar-instance.
 </td>
                 
             </tr>
@@ -633,9 +662,9 @@ For example, if you are filtering Compute Engine instances, you can exclude inst
             <tr>
                 
                 <td >Order By</td>
-                <td>Sorts list results by a certain order. By default, results are returned in alphanumerical order based on the resource name.
+                <td>Order used to sort results.
 
-You can also sort results in descending order based on the creation timestamp using orderBy="creationTimestamp desc". This sorts results based on the creationTimestamp field in reverse chronological order (newest result first). Use this to sort resources like operations so that the newest operation is returned first.
+By default results are sorted in alphanumerical order of resource name. In addition results can be sorted in descending order of time stamp by using orderBy="creationTimestamp desc". This sorts results based on the creationTimestamp field in reverse chronological order (newest result first).
 
 Currently, only sorting by name or creationTimestamp desc is supported.
 </td>
@@ -645,7 +674,7 @@ Currently, only sorting by name or creationTimestamp desc is supported.
             <tr>
                 
                 <td class="required">Result Property Sheet</td>
-                <td></td>
+                <td>Property Sheet used to store JSON representation of instances found.</td>
                 
             </tr>
             
@@ -665,7 +694,7 @@ Currently, only sorting by name or creationTimestamp desc is supported.
             
             <tr>
                 <td>instances</td>
-                <td>JSON representation of instances found</td>
+                <td>JSON representation of instances found.</td>
             </tr>
             
             </tbody>
@@ -680,7 +709,7 @@ Currently, only sorting by name or creationTimestamp desc is supported.
         <h2>Run Script</h2>
         
         
-        <p>Runs a custom groovy script with the prepared GCP client</p>
+        <p>Runs a custom groovy script using the GCP client.</p>
         
         
         <h3>Run Script Parameters</h3>
@@ -703,15 +732,14 @@ Currently, only sorting by name or creationTimestamp desc is supported.
             <tr>
                 
                 <td class="required">Script</td>
-                <td>Script to evaluate. The following variables are accessible:
+                <td>Script to evaluate.<br/>
+This is an example.<br/><br/>
 
-compute - compute client
-ef - ElectricFlow Groovy API client
-zone - zone name from the configuration
-project - project ID from the configuration
-wrapper - Compute wrapper from this plugin
-
-Both wrapper and compute clients are already initialized.
+println "Compute raw client: $compute"<br/>
+println "Project ID: $project"<br/>
+println "Zone: $zone"<br/>
+println "Flow Client: $ef"<br/>
+println "Compute Wrapper: $wrapper"<br/>
 </td>
                 
             </tr>
@@ -732,7 +760,7 @@ Both wrapper and compute clients are already initialized.
             
             <tr>
                 <td>output</td>
-                <td>Some output parameter to use in the script</td>
+                <td>Some output parameter to use in the script. Evaluation result (the last value returned by the script) will be saved into this parameter.</td>
             </tr>
             
             </tbody>
@@ -747,7 +775,7 @@ Both wrapper and compute clients are already initialized.
         <h2>Delete Instances</h2>
         
         
-        <p>Destroys GCP machines</p>
+        <p>Destroys one or more Virtual Machine Instances in GCP.</p>
         
         
         <h3>Delete Instances Parameters</h3>
@@ -770,14 +798,16 @@ Both wrapper and compute clients are already initialized.
             <tr>
                 
                 <td class="required">Instance Names</td>
-                <td>Newline-separated instance names to delete</td>
+                <td>Instance name.<br/>
+In case of multiple instances, specify one instance name per line.
+</td>
                 
             </tr>
             
             <tr>
                 
                 <td >Timeout in Seconds</td>
-                <td>Timeout to wait for instances to be deleted in seconds</td>
+                <td>Time (in seconds) to wait for instances to be deleted.</td>
                 
             </tr>
             
@@ -794,7 +824,7 @@ Both wrapper and compute clients are already initialized.
         <h2>Reset Instances</h2>
         
         
-        <p>Reset GCP instances</p>
+        <p>Reset one or more Virtual Machine Instances in GCP.</p>
         
         
         <h3>Reset Instances Parameters</h3>
@@ -817,7 +847,9 @@ Both wrapper and compute clients are already initialized.
             <tr>
                 
                 <td class="required"></td>
-                <td>Newline-separated instance names</td>
+                <td>Instance name.<br/>
+In case of multiple instances, specify one instance name per line.
+</td>
                 
             </tr>
             
@@ -834,7 +866,7 @@ Both wrapper and compute clients are already initialized.
         <h2>Stop Instances</h2>
         
         
-        <p>Stops GCP instances</p>
+        <p>Stops one or more Virtual Machine Instances in GCP.</p>
         
         
         <h3>Stop Instances Parameters</h3>
@@ -857,14 +889,16 @@ Both wrapper and compute clients are already initialized.
             <tr>
                 
                 <td class="required">Instance Names</td>
-                <td>Newline separated instance names</td>
+                <td>Instance name.<br/>
+In case of multiple instances, specify one instance name per line.
+</td>
                 
             </tr>
             
             <tr>
                 
                 <td >Timeout</td>
-                <td>Timeout in seconds to wait for the instances to stop. -1 means no timeout.</td>
+                <td>Time (in seconds) to wait for instances to be deleted.</td>
                 
             </tr>
             
@@ -881,7 +915,9 @@ Both wrapper and compute clients are already initialized.
         <h2>Teardown</h2>
         
         
-        <p>Deletes machines from the resource pool or the specified resource</p>
+        <p>Deletes Virtual Machines Instance or Instances that correspond to either a Flow Resource or a Flow Resource Pool.
+This procedure essentially calls the Delete Instance procedure followed by removing the Resource from Flow.
+</p>
         
         
         <h3>Teardown Parameters</h3>
@@ -896,7 +932,7 @@ Both wrapper and compute clients are already initialized.
             
             <tr>
                 
-                <td class="required">Flow resource name or pool name</td>
+                <td class="required">Resource name or pool name</td>
                 <td>Flow resource name or pool name</td>
                 
             </tr>
