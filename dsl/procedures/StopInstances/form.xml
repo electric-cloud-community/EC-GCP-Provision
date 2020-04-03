@@ -17,15 +17,16 @@
     <type>textarea</type>
     <property>instanceNames</property>
     <required>1</required>
-    <documentation>Newline separated instance names</documentation>
+    <htmlDocumentation>Instance name.
+In case of multiple instances, specify one instance name per line.
+</htmlDocumentation>
     <label>Instance Names:</label>
   </formElement>
   <formElement>
     <type>integer</type>
     <property>timeout</property>
     <required>0</required>
-    <documentation>Timeout in seconds to wait for the instances to stop. -1 means no timeout.</documentation>
+    <documentation>Time (in seconds) to wait for instances to be deleted.</documentation>
     <label>Timeout:</label>
-    <value>-1</value>
   </formElement>
 </editor>

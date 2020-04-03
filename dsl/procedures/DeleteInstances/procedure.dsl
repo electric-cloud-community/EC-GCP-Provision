@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Delete Instances', description: '''Destroys GCP machines''', {
+procedure 'Delete Instances', description: '''Destroys one or more Virtual Machine Instances in GCP.''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -21,7 +21,7 @@ procedure 'Delete Instances', description: '''Destroys GCP machines''', {
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 27a2525e0c96ce97037e0d33f94cfba0 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 66c4680a6a467196af9c673f7fd860e6 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

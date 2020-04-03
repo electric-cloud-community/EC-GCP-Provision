@@ -1,6 +1,8 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Teardown', description: '''Deletes machines from the pool or the specified resource''', {
+procedure 'Teardown', description: '''Deletes Virtual Machines Instance or Instances that correspond to either a Flow Resource or a Flow Resource Pool.
+This procedure essentially calls the Delete Instance procedure followed by removing the Resource from Flow.
+''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -21,7 +23,7 @@ procedure 'Teardown', description: '''Deletes machines from the pool or the spec
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: d1b5a268c436e6e070a79bd70844a49c ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 215b5500a2abd33dd79aad35b0d82b86 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

@@ -93,6 +93,7 @@ __PACKAGE__->defineClass({
     stdout => FlowPDF::Types::Scalar(),
     stderr => FlowPDF::Types::Scalar(),
     code   => FlowPDF::Types::Scalar(),
+    errmsg => FlowPDF::Types::Scalar(),
 });
 use Carp;
 

@@ -17,13 +17,17 @@
     <type>textarea</type>
     <property>instanceNames</property>
     <required>1</required>
-    <documentation>Newline separated instance names</documentation>
+    <htmlDocumentation>Instance name.<br/>
+In case of multiple instances, specify one instance name per line.
+</htmlDocumentation>
     <label>Instance Names:</label>
   </formElement>
   <formElement>
     <type>entry</type>
     <property>resultProperty</property>
     <required>1</required>
+    <documentation>Property Sheet to store instances that are started in JSON format.
+</documentation>
     <label>Result Property Sheet:</label>
     <value>/myJob/result</value>
   </formElement>

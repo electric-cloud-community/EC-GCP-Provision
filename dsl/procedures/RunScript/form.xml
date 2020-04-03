@@ -17,16 +17,16 @@
     <type>textarea</type>
     <property>script</property>
     <required>1</required>
-    <documentation>Script to evaluate. The following variables are accessible:
-
-compute - compute client
-ef - ElectricFlow Groovy API client
-zone - zone name from the configuration
-project - project ID from the configuration
-wrapper - Compute wrapper from this plugin
-
-Both wrapper and compute clients are already initialized.
-</documentation>
+    <htmlDocumentation>Script to evaluate.
+This is an example:
+<pre>
+println "Compute raw client: $compute"
+println "Project ID: $project"
+println "Zone: $zone"
+println "Flow Client: $ef"
+println "Compute Wrapper: $wrapper"
+</pre>
+</htmlDocumentation>
     <label>Script:</label>
     <value>println "Compute raw client: $compute"
 println "Project ID: $project"

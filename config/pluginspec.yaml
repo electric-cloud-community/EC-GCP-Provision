@@ -33,7 +33,7 @@ configuration:
     label: Description
   -
     name: projectId
-    documentation: Project ID for the main project
+    documentation: Project ID of the project in GCP under which Instances are provisioned.
     required: true
     type: entry
     label: Project Id
@@ -45,7 +45,38 @@ configuration:
     label: Zone
   -
     name: credential
-    documentation: Service account key in JSON format
+    documentation: |
+      Service account key in JSON format. For example,
+
+      {
+        "type": "service_account",
+        "project_id": "PROJECT ID",
+        "private_key_id": "PRIVATE KEY ID",
+        "private_key": "-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n",
+        "client_email": "SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com",
+        "client_id": "CLIENT ID",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID"
+      }
+
+    htmlDocumentation: |
+      Service account key in JSON format. For example,<br/>
+      <pre>
+      {
+        "type": "service_account",
+        "project_id": "PROJECT ID",
+        "private_key_id": "PRIVATE KEY ID",
+        "private_key": "-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n",
+        "client_email": "SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com",
+        "client_id": "CLIENT ID",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID"
+      }
+      </pre>
     required: true
     type: credential
     credentialType: key
@@ -92,24 +123,34 @@ properties:
 procedures:
 
 - name: Teardown
-  description: Deletes machines from the pool or the specified resource
+  description: |
+    Deletes Virtual Machines Instance or Instances that correspond to either a Flow Resource or a Flow Resource Pool.
+    This procedure essentially calls the Delete Instance procedure followed by removing the Resource from Flow.
   hasConfig: false
   parameters:
     - name: resName
       required: true
+      type: textarea
+      label: Resource name or pool name
+      documentation: Flow resource name or pool name
 
 - name: Delete Instances
-  description: Destroys GCP machines
+  description: Destroys one or more Virtual Machine Instances in GCP.
   hasConfig: true
   parameters:
     - name: instanceNames
       required: true
       type: textarea
       label: Instance Names
-      documentation: Newline-separated instance names to delete
+      htmlDocumentation: |
+          Instance name.<br/>
+          In case of multiple instances, specify one instance name per line.
+      documentation: |
+          Instance name.
+          In case of multiple instances, specify one instance name per line.
     - name: timeoutSeconds
       label: Timeout in Seconds
-      documentation: Timeout to wait for instances to be deleted in seconds
+      documentation: Time (in seconds) to wait for instances to be deleted.
       value: 300
       type: integer
 #
@@ -127,24 +168,23 @@ procedures:
 #      uncheckedValue: false
 
 - name: Run Script
-  description: Runs a custom groovy script with the prepared GCP client
+  description: Runs a custom groovy script using the GCP client.
   hasConfig: true
   parameters:
     - name: script
       type: textarea
       label: Script
       required: true
-      documentation: |
-        Script to evaluate. The following variables are accessible:
-
-        compute - compute client
-        ef - ElectricFlow Groovy API client
-        zone - zone name from the configuration
-        project - project ID from the configuration
-        wrapper - Compute wrapper from this plugin
-
-        Both wrapper and compute clients are already initialized.
-
+      htmlDocumentation: |
+        Script to evaluate.
+        This is an example:
+        <pre>
+        println "Compute raw client: $compute"
+        println "Project ID: $project"
+        println "Zone: $zone"
+        println "Flow Client: $ef"
+        println "Compute Wrapper: $wrapper"
+        </pre>
       value: |
         println "Compute raw client: $compute"
         println "Project ID: $project"
@@ -153,52 +193,58 @@ procedures:
         println "Compute Wrapper: $wrapper"
 
   outputParameters:
-    output: Some output parameter to use in the script
+    output: Some output parameter to use in the script. Evaluation result (the last value returned by the script) will be saved into this parameter.
 
 
 - name: Stop Instances
   hasConfig: true
-  description: Stops GCP instances
+  description: Stops one or more Virtual Machine Instances in GCP.
   parameters:
     - name: instanceNames
       required: true
-      documentation: Newline separated instance names
+      htmlDocumentation: |
+        Instance name.
+        In case of multiple instances, specify one instance name per line.
       label: Instance Names
       type: textarea
     - name: timeout
       required: false
-      value: -1
       label: Timeout
       type: integer
-      documentation: Timeout in seconds to wait for the instances to stop. -1 means no timeout.
+      documentation: Time (in seconds) to wait for instances to be deleted.
 
 - name: Start Instances
   hasConfig: true
-  description: Starts GCP instances
+  description: Starts one or more Virtual Machine Instances in GCP.
   parameters:
     - name: instanceNames
       type: textarea
       required: true
-      documentation: Newline separated instance names
+      htmlDocumentation: |
+        Instance name.<br/>
+        In case of multiple instances, specify one instance name per line.
       label: Instance Names
     - name: resultProperty
       required: true
       value: '/myJob/result'
       type: entry
       label: Result Property Sheet
+      documentation: |
+        Property Sheet to store instances that are started in JSON format.
   outputParameters:
     instances: JSON representation of instances
 
 - name: List Instances
-  description: Lists instances for the provided parameters
+  description: List Virtual Machine instances in GCP.
   hasConfig: true
   parameters:
     - name: filter
       label: Filter
-      documentation: |
-        A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <.
-
-        For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
+      htmlDocumentation: |
+        Filter expression used to filter resources. The filter expression must specify the field name,
+        a comparison operator, and the value used to filter them.<br/><br/>
+        The value must be a string, a number, or a boolean and the comparison operator must be either =, !=, &gt;, or &lt;.<br/>
+        For example, name != foobar-instance will exclude all Virtual Instances named foobar-instance.
       required: false
       type: textarea
 
@@ -211,12 +257,11 @@ procedures:
     - name: orderBy
       label: Order By
       documentation: |
-        Sorts list results by a certain order. By default, results are returned in alphanumerical order based on the resource name.
+        Order used to sort results.
 
-        You can also sort results in descending order based on the creation timestamp using orderBy="creationTimestamp desc". This sorts results based on the creationTimestamp field in reverse chronological order (newest result first). Use this to sort resources like operations so that the newest operation is returned first.
+        By default results are sorted in alphanumerical order of resource name. In addition results can be sorted in descending order of time stamp by using orderBy="creationTimestamp desc". This sorts results based on the creationTimestamp field in reverse chronological order (newest result first).
 
         Currently, only sorting by name or creationTimestamp desc is supported.
-
       type: entry
       required: false
     - name: resultProperty
@@ -224,17 +269,21 @@ procedures:
       value: /myJob/instances
       required: true
       label: Result Property Sheet
+      documentation: Property Sheet used to store JSON representation of instances found.
 
   outputParameters:
-    instances: JSON representation of instances found
+    instances: JSON representation of instances found.
 
 - name: Reset Instances
   hasConfig: true
+  description: Reset one or more Virtual Machine Instances in GCP.
   parameters:
     - name: instanceNames
       required: true
       type: textarea
-      documentation: Newline-separated instance names
+      htmlDocumentation: |
+        Instance name.<br/>
+        In case of multiple instances, specify one instance name per line.
 
 
 #- name: Update Instances
@@ -258,7 +307,7 @@ procedures:
 
 -
   name: 'Provision'
-  description: Creates one or few instances from the provided parameters
+  description: Creates one or more Virtual Machine instances.
   hasConfig: true
 
 #  properties:
@@ -274,13 +323,15 @@ procedures:
 #            path: 'dsl/procedures/Provision/instanceType.groovy'
 
   outputParameters:
-    instanceDetails: Details for the created instances
+    instanceDetails: Details of the Instance created.
   parameters:
   - name: instanceNameTemplate
     required: false
     type: entry
     label: Instance Name Template
-    documentation: Template for instance name, e.g. my-instance-1. The instance name will be generated by adding a random number to the end of this template.
+    htmlDocumentation: |
+      Name of the instance template e.g. my-instance-1.<br/>
+      The instance name is typically generated by adding a random string to the end of this name.
   - name: instanceType
     required: true
     condition: ${config} != ""
@@ -292,14 +343,20 @@ procedures:
     required: false
     type: entry
     label: Source Image
-    documentation: Source image starting with a project name, e.g. my-project/global/images/image-name. Either URL or family should be provided.
+    htmlDocumentation: |
+      Source image starting with a project name, e.g. my-project/global/images/image-name.<br/>
+      Either URL or family should be provided.
   - name: sourceImageProject
     label: Source Image Project
-    documentation: Source image project. If not set, the project from the configuration will be used.
+    htmlDocumentation: |
+      Project to which Source Image belongs.<br/>
+      If not specified, the project from the configuration will be used.
   - name: sourceImageFamily
     label: Source Image Family
     type: entry
-    documentation: Source image family. Either family or URL should be provided.
+    htmlDocumentation: |
+      Source Image family.<br/>
+      Either the family or a URL should be provided.
   - name: keys
     type: textarea
     required: false
@@ -311,11 +368,11 @@ procedures:
     required: true
     type: entry
     label: Network
-    documentation: The name of VPC network, e.g. default
+    documentation: The name of the VPC network, e.g. default.
   - name: subnetwork
     required: true
     label: Subnetwork
-    documentation: The name of VPC subnetwork
+    documentation: The name of the VPC subnetwork
     value: default
   - name: diskSize
     required: false
@@ -333,8 +390,7 @@ procedures:
     checkedValue: true
     uncheckedValue: false
     label: Assign Public IP?
-    documentation: If checked, the a NAT network interface will be attached to the instance.
-
+    documentation: If checked, a NAT network interface will be attached to the instance.
   - name: useServiceAccount
     type: radio
     required: false
@@ -347,10 +403,15 @@ procedures:
         value: anotherAccount
     value: noAccount
     label: Use Service Account
-    documentation: |
-      Which service account will be used by the provisioned machine. If same service account is chosen, the service account that
-      is provided by the plugin configuration will be used. If another service account is chosen, the service account in the plugin configuration
-      must have access to this service account.
+    htmlDocumentation: |
+      If specified, the Service Account used to provision the virtual machine.
+      Options are as follows.<br/><br/>
+
+      <ul>
+      <li>None - No Service Account is used.</li>
+      <li>Same - Use the Service Account as in the plugin configuration.</li>
+      <li>Another - Use the Service account as specified in the Service Account email field. In this case the expectation is that the Service Account used in the plugin configuration has privileges to access this other service account.</li>
+      </ul>
   - name: serviceAccountEmail
     label: Service Account Email
     dependsOn: useServiceAccount
@@ -379,10 +440,12 @@ procedures:
     type: integer
     label: Timeout in Seconds
     value: 300
-    documentation: Time to wait for the operation to finish (in seconds). Please note that the resource availability is NOT checked.
+    htmlDocumentation: |
+        If specified, time to wait for provisioning to finish (in seconds).<br/>
+        Note that resource availability is not checked during the time out period.
   - name: resourcePoolName
     required: false
-    documentation: If provided, a resource will be created for the instance and placed into this pool.
+    documentation: If specified, the resource will be created for the instance and placed into this pool.
     label: Resource Pool Name
     type: entry
   - name: resourcePort
@@ -396,7 +459,7 @@ procedures:
     required: false
     value: default
     type: entry
-    documentation: Workspace name for the resource.
+    documentation: Workspace name for the created resource.
     label: Resource Workspace
     dependsOn: resourcePoolName
     condition: ${resourcePoolName} != ""
@@ -411,30 +474,38 @@ procedures:
     value: /myJob/result
     type: entry
     required: false
-    documentation: Property sheet to store instance result
+    documentation: Property sheet to store instance result.
     label: Result Property
 
 - name: Create Image
   hasConfig: true
-  description: Creates a new image
+  description: Creates a new Virtual Machine image in GCP
   parameters:
     - name: family
       type: entry
       required: false
       label: Family
       documentation: |
-        Image family for the new image. If the image name is not provided the new image name will be calculate from the
-        family name. Either image name or a family name must be provided.
+        Name of the Image family.
+        Either image family name or image name should be provided.
+        If the image name is not provided, it will be calculated from the family name.
     - name: name
       required: false
       label: Name
       documentation: |
-        Name for the new image. If the name is not provided, the family must be provided and the
-        image name will be calculated from the family name.
-        Either image name or a family name must be provided.
+        Name of the image.
+        Either image family name or image name should be provided.
+        If the image name is not provided, it will be calculated from the family name.
     - name: source
       type: radio
       label: Source
+      htmlDocumentation: |
+        Source from which Image is created. It should be one of the following:
+        <ul>
+        <li>Source Disk</li>
+        <li>Source Snapshot</li>
+        <li>Source Image</li>
+        </ul>
       options:
         - name: Source Disk
           value: sourceDisk
@@ -449,11 +520,14 @@ procedures:
       label: Source Disk
       dependsOn: source
       condition: ${source == 'sourceDisk'}
-      documentation: Source disk name for the image.
+      documentation: Name of the Source Disk.
     - name: diskZone
       required: false
-      documentation: Zone for the source disk if the source disk is used.
+      documentation: |
+        Zone of the Source Disk.
+        If Source Disk is chosen, this field should be specified.
       dependsOn: source
+      label: Disk Zone
       condition: ${source == 'sourceDisk'}
     - name: sourceSnapshot
       type: entry
@@ -465,7 +539,7 @@ procedures:
     - name: sourceImage
       type: entry
       required: false
-      documentation: Source image name
+      documentation: Name of the Source image.
       dependsOn: source
       label: Source Image
       condition: ${source == 'sourceImage'}
@@ -492,8 +566,7 @@ procedures:
       uncheckedValue: false
       value: false
       label: Force Create?
-      documentation: |
-        If checked, the image will be created if the disk is in use by a running instance.
+      documentation: If checked, the image will be created even if the disk is in use by a running instance.
     - name: locations
       type: textarea
       label: Locations

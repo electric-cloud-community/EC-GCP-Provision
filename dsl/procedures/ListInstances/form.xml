@@ -17,10 +17,11 @@
     <type>textarea</type>
     <property>filter</property>
     <required>0</required>
-    <documentation>A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, &gt;, or &lt;.
-
-For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
-</documentation>
+    <htmlDocumentation>Filter expression used to filter resources. The filter expression must specify the field name,
+a comparison operator, and the value used to filter them.<br/><br/>
+The value must be a string, a number, or a boolean and the comparison operator must be either =, !=, &gt;, or &lt;.<br/>
+For example, name != foobar-instance will exclude all Virtual Instances named foobar-instance.
+</htmlDocumentation>
     <label>Filter:</label>
   </formElement>
   <formElement>
@@ -35,9 +36,9 @@ For example, if you are filtering Compute Engine instances, you can exclude inst
     <type>entry</type>
     <property>orderBy</property>
     <required>0</required>
-    <documentation>Sorts list results by a certain order. By default, results are returned in alphanumerical order based on the resource name.
+    <documentation>Order used to sort results.
 
-You can also sort results in descending order based on the creation timestamp using orderBy="creationTimestamp desc". This sorts results based on the creationTimestamp field in reverse chronological order (newest result first). Use this to sort resources like operations so that the newest operation is returned first.
+By default results are sorted in alphanumerical order of resource name. In addition results can be sorted in descending order of time stamp by using orderBy="creationTimestamp desc". This sorts results based on the creationTimestamp field in reverse chronological order (newest result first).
 
 Currently, only sorting by name or creationTimestamp desc is supported.
 </documentation>
@@ -47,6 +48,7 @@ Currently, only sorting by name or creationTimestamp desc is supported.
     <type>entry</type>
     <property>resultProperty</property>
     <required>1</required>
+    <documentation>Property Sheet used to store JSON representation of instances found.</documentation>
     <label>Result Property Sheet:</label>
     <value>/myJob/instances</value>
   </formElement>

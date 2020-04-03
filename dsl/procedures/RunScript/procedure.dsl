@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Run Script', description: '''Runs a custom groovy script with the prepared GCP client''', {
+procedure 'Run Script', description: '''Runs a custom groovy script using the GCP client.''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -23,8 +23,8 @@ procedure 'Run Script', description: '''Runs a custom groovy script with the pre
     }
 
     formalOutputParameter 'output',
-        description: 'Some output parameter to use in the script'
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 208ae1fa52e6189a482f4e8d8862d347 ===
+        description: 'Some output parameter to use in the script. Evaluation result (the last value returned by the script) will be saved into this parameter.'
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: f5f21cd20b0a7332b96895f393ea8580 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

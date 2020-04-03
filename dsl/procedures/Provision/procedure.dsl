@@ -1,6 +1,6 @@
 // This procedure.dsl was generated automatically
 // DO NOT EDIT THIS BLOCK === procedure_autogen starts ===
-procedure 'Provision', description: '''Creates one or few instances from the provided parameters''', {
+procedure 'Provision', description: '''Creates one or more Virtual Machine instances.''', {
 
     // Handling binary dependencies
     step 'flowpdk-setup', {
@@ -23,8 +23,8 @@ procedure 'Provision', description: '''Creates one or few instances from the pro
     }
 
     formalOutputParameter 'instanceDetails',
-        description: 'Details for the created instances'
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: a166f01109680194bcaa2eb299136f48 ===
+        description: 'Details of the Instance created.'
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: ba9d3825dfeb4155299b863e6001426a ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"
