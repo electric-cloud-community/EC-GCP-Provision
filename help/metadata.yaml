@@ -10,5 +10,6 @@ proceduresOrder:
   - Reset Instances
   - Stop Instances
   - Teardown
-knownIssues: |
-  NA
+proceduresPreface: |
+  **IMPORTANT** Note that the names of Required parameters are marked in __*bold italics*__ in the parameter description table for each procedure.
+

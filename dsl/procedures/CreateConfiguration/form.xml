@@ -37,19 +37,35 @@
     <type>credential</type>
     <property>credential</property>
     <required>1</required>
+    <htmlDocumentation>Service account key in JSON format. For example,<br/>
+<pre>
+{
+  "type": "service_account",
+  "project_id": "PROJECT ID",
+  "private_key_id": "PRIVATE KEY ID",
+  "private_key": "-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n",
+  "client_email": "SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com",
+  "client_id": "CLIENT ID",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID"
+}
+</pre>
+</htmlDocumentation>
     <documentation>Service account key in JSON format. For example,
 
 {
   "type": "service_account",
-  "project_id": "&lt;project id&gt;",
-  "private_key_id": "&lt;private key id&gt;",
-  "private_key": "-----BEGIN PRIVATE KEY-----&lt;private key content&gt;-----END PRIVATE KEY-----\n",
-  "client_email": "&lt;service account name&gt;@&lt;project id&gt;.iam.gserviceaccount.com",
-  "client_id": "&lt;client id&gt;",
+  "project_id": "PROJECT ID",
+  "private_key_id": "PRIVATE KEY ID",
+  "private_key": "-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n",
+  "client_email": "SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com",
+  "client_id": "CLIENT ID",
   "auth_uri": "https://accounts.google.com/o/oauth2/auth",
   "token_uri": "https://oauth2.googleapis.com/token",
   "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/&lt;account id&gt;"
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID"
 }
 </documentation>
     <label>Credential:</label>

@@ -17,20 +17,20 @@
     <type>entry</type>
     <property>family</property>
     <required>0</required>
-    <htmlDocumentation>Name of the Image family.<br/>
-Either image family name or image name should be provided.<br/>
+    <documentation>Name of the Image family.
+Either image family name or image name should be provided.
 If the image name is not provided, it will be calculated from the family name.
-</htmlDocumentation>
+</documentation>
     <label>Family:</label>
   </formElement>
   <formElement>
     <type>entry</type>
     <property>name</property>
     <required>0</required>
-    <htmlDocumentation>Name of the image.<br/>
-Either image family name or image name should be provided.<br/>
+    <documentation>Name of the image.
+Either image family name or image name should be provided.
 If the image name is not provided, it will be calculated from the family name.
-</htmlDocumentation>
+</documentation>
     <label>Name:</label>
   </formElement>
   <formElement>
@@ -71,9 +71,10 @@ If the image name is not provided, it will be calculated from the family name.
     <type>entry</type>
     <property>diskZone</property>
     <required>0</required>
-    <htmlDocumentation>Zone of the Source Disk.<br/>
+    <documentation>Zone of the Source Disk.
 If Source Disk is chosen, this field should be specified.
-</htmlDocumentation>
+</documentation>
+    <label>Disk Zone:</label>
     <condition>${source == 'sourceDisk'}</condition>
     <dependsOn>source</dependsOn>
   </formElement>

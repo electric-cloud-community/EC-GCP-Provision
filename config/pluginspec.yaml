@@ -50,17 +50,33 @@ configuration:
 
       {
         "type": "service_account",
-        "project_id": "<project id>",
-        "private_key_id": "<private key id>",
-        "private_key": "-----BEGIN PRIVATE KEY-----<private key content>-----END PRIVATE KEY-----\n",
-        "client_email": "<service account name>@<project id>.iam.gserviceaccount.com",
-        "client_id": "<client id>",
+        "project_id": "PROJECT ID",
+        "private_key_id": "PRIVATE KEY ID",
+        "private_key": "-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n",
+        "client_email": "SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com",
+        "client_id": "CLIENT ID",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://oauth2.googleapis.com/token",
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/<account id>"
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID"
       }
 
+    htmlDocumentation: |
+      Service account key in JSON format. For example,<br/>
+      <pre>
+      {
+        "type": "service_account",
+        "project_id": "PROJECT ID",
+        "private_key_id": "PRIVATE KEY ID",
+        "private_key": "-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n",
+        "client_email": "SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com",
+        "client_id": "CLIENT ID",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID"
+      }
+      </pre>
     required: true
     type: credential
     credentialType: key
@@ -126,8 +142,11 @@ procedures:
       required: true
       type: textarea
       label: Instance Names
-      documentation: |
+      htmlDocumentation: |
           Instance name.<br/>
+          In case of multiple instances, specify one instance name per line.
+      documentation: |
+          Instance name.
           In case of multiple instances, specify one instance name per line.
     - name: timeoutSeconds
       label: Timeout in Seconds
@@ -156,15 +175,16 @@ procedures:
       type: textarea
       label: Script
       required: true
-      documentation: |
-          Script to evaluate.<br/>
-          This is an example.<br/><br/>
-
-          println "Compute raw client: $compute"<br/>
-          println "Project ID: $project"<br/>
-          println "Zone: $zone"<br/>
-          println "Flow Client: $ef"<br/>
-          println "Compute Wrapper: $wrapper"<br/>
+      htmlDocumentation: |
+        Script to evaluate.
+        This is an example:
+        <pre>
+        println "Compute raw client: $compute"
+        println "Project ID: $project"
+        println "Zone: $zone"
+        println "Flow Client: $ef"
+        println "Compute Wrapper: $wrapper"
+        </pre>
       value: |
         println "Compute raw client: $compute"
         println "Project ID: $project"
@@ -182,8 +202,8 @@ procedures:
   parameters:
     - name: instanceNames
       required: true
-      documentation: |
-        Instance name.<br/>
+      htmlDocumentation: |
+        Instance name.
         In case of multiple instances, specify one instance name per line.
       label: Instance Names
       type: textarea
@@ -200,7 +220,7 @@ procedures:
     - name: instanceNames
       type: textarea
       required: true
-      documentation: |
+      htmlDocumentation: |
         Instance name.<br/>
         In case of multiple instances, specify one instance name per line.
       label: Instance Names
@@ -465,16 +485,16 @@ procedures:
       type: entry
       required: false
       label: Family
-      htmlDocumentation: |
-        Name of the Image family.<br/>
-        Either image family name or image name should be provided.<br/>
+      documentation: |
+        Name of the Image family.
+        Either image family name or image name should be provided.
         If the image name is not provided, it will be calculated from the family name.
     - name: name
       required: false
       label: Name
-      htmlDocumentation: |
-        Name of the image.<br/>
-        Either image family name or image name should be provided.<br/>
+      documentation: |
+        Name of the image.
+        Either image family name or image name should be provided.
         If the image name is not provided, it will be calculated from the family name.
     - name: source
       type: radio
@@ -503,10 +523,11 @@ procedures:
       documentation: Name of the Source Disk.
     - name: diskZone
       required: false
-      htmlDocumentation: |
-        Zone of the Source Disk.<br/>
+      documentation: |
+        Zone of the Source Disk.
         If Source Disk is chosen, this field should be specified.
       dependsOn: source
+      label: Disk Zone
       condition: ${source == 'sourceDisk'}
     - name: sourceSnapshot
       type: entry

@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on April 01, 2020</p>
+    <p>Revised on April 03, 2020</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -74,8 +74,6 @@
     
     
     
-    
-    <li><a href="#knownIssues">Known Issues</a></li>
     
     
     <li><a href="#releaseNotes">Release Notes</a></li>
@@ -160,21 +158,20 @@
             <tr>
                 
                     <td class="required">Credential</td>
-                    <td>Service account key in JSON format. For example,
-
+                    <td>Service account key in JSON format. For example,<br/><pre>
 {
-  "type": "service_account",
-  "project_id": "<project id>",
-  "private_key_id": "<private key id>",
-  "private_key": "-----BEGIN PRIVATE KEY-----<private key content>-----END PRIVATE KEY-----\n",
-  "client_email": "<service account name>@<project id>.iam.gserviceaccount.com",
-  "client_id": "<client id>",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/<account id>"
+  &quot;type&quot;: &quot;service_account&quot;,
+  &quot;project_id&quot;: &quot;PROJECT ID&quot;,
+  &quot;private_key_id&quot;: &quot;PRIVATE KEY ID&quot;,
+  &quot;private_key&quot;: &quot;-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n&quot;,
+  &quot;client_email&quot;: &quot;SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com&quot;,
+  &quot;client_id&quot;: &quot;CLIENT ID&quot;,
+  &quot;auth_uri&quot;: &quot;https://accounts.google.com/o/oauth2/auth&quot;,
+  &quot;token_uri&quot;: &quot;https://oauth2.googleapis.com/token&quot;,
+  &quot;auth_provider_x509_cert_url&quot;: &quot;https://www.googleapis.com/oauth2/v1/certs&quot;,
+  &quot;client_x509_cert_url&quot;: &quot;https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID&quot;
 }
-</td>
+</pre></td>
                 
             </tr>
             
@@ -202,6 +199,11 @@
 
     <h1 id="procedures">Plugin Procedures</h1>
     
+    
+    <p>
+        <p><strong>IMPORTANT</strong> Note that the names of Required parameters are marked in <strong><em>bold italics</em></strong> in the parameter description table for each procedure.</p>
+
+    </p>
     
 
     
@@ -232,8 +234,8 @@
             <tr>
                 
                 <td >Family</td>
-                <td>Name of the Image family.<br/>
-Either image family name or image name should be provided.<br/>
+                <td>Name of the Image family.
+Either image family name or image name should be provided.
 If the image name is not provided, it will be calculated from the family name.
 </td>
                 
@@ -242,8 +244,8 @@ If the image name is not provided, it will be calculated from the family name.
             <tr>
                 
                 <td >Name</td>
-                <td>Name of the image.<br/>
-Either image family name or image name should be provided.<br/>
+                <td>Name of the image.
+Either image family name or image name should be provided.
 If the image name is not provided, it will be calculated from the family name.
 </td>
                 
@@ -266,8 +268,8 @@ If the image name is not provided, it will be calculated from the family name.
             
             <tr>
                 
-                <td ></td>
-                <td>Zone of the Source Disk.<br/>
+                <td >Disk Zone</td>
+                <td>Zone of the Source Disk.
 If Source Disk is chosen, this field should be specified.
 </td>
                 
@@ -732,15 +734,15 @@ Currently, only sorting by name or creationTimestamp desc is supported.
             <tr>
                 
                 <td class="required">Script</td>
-                <td>Script to evaluate.<br/>
-This is an example.<br/><br/>
-
-println "Compute raw client: $compute"<br/>
-println "Project ID: $project"<br/>
-println "Zone: $zone"<br/>
-println "Flow Client: $ef"<br/>
-println "Compute Wrapper: $wrapper"<br/>
-</td>
+                <td>Script to evaluate.
+This is an example:
+<pre>
+println &quot;Compute raw client: $compute&quot;
+println &quot;Project ID: $project&quot;
+println &quot;Zone: $zone&quot;
+println &quot;Flow Client: $ef&quot;
+println &quot;Compute Wrapper: $wrapper&quot;
+</pre></td>
                 
             </tr>
             
@@ -889,7 +891,7 @@ In case of multiple instances, specify one instance name per line.
             <tr>
                 
                 <td class="required">Instance Names</td>
-                <td>Instance name.<br/>
+                <td>Instance name.
 In case of multiple instances, specify one instance name per line.
 </td>
                 
@@ -956,22 +958,9 @@ This procedure essentially calls the Delete Instance procedure followed by remov
     
     
     
-    <h1 id="knownIssues">Known Issues</h1>
-    <div>
-        <p>NA</p>
-
-    </div>
-    
     
 
     <h1 id="releaseNotes">Release Notes</h1>
-    
-    <h3>@PLUGIN_KEY@ 1.0.1</h3>
-    <ul>
-        
-        <li>Help document Added.</li>
-        
-    </ul>
     
     <h3>@PLUGIN_KEY@ 1.0.0</h3>
     <ul>
