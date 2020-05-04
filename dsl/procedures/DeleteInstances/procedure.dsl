@@ -17,11 +17,11 @@ procedure 'Delete Instances', description: '''Destroys one or more Virtual Machi
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 66c4680a6a467196af9c673f7fd860e6 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 85723c7db4d6880943c43c65f94af62e ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

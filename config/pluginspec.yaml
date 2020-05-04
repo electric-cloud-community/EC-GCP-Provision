@@ -3,7 +3,7 @@ pluginInfo:
   # Feel free to change it
   # Call flowpdk showdoc pluginspec to see the list of available fields and their description
   pluginName: 'EC-GCP-Provision'
-  version: '1.0.0'
+  version: '1.1.0'
   description: 'This plugin integrates with Google Cloud Platform to provision new resources from the pre-defined resource templates.'
   author: 'Polina'
   supportUrl: 'pshubina@cloudbees.com'
@@ -436,13 +436,22 @@ procedures:
     label: Count
     documentation: The number of instances to create.
     value: 1
+  - name: pingResource
+    type: checkbox
+    label: Ping Resource?
+    dependsOn: resourcePoolName
+    condition: ${resourcePoolName} != ""
+    required: false
+    value: false
+    checkedValue: true
+    uncheckedValue: false
+    htmlDocumentation: If checked, the resource will be pinged and the job will finish successfully only when the resource is up and running.
   - name: waitTimeout
     type: integer
     label: Timeout in Seconds
     value: 300
     htmlDocumentation: |
-        If specified, time to wait for provisioning to finish (in seconds).<br/>
-        Note that resource availability is not checked during the time out period.
+        If specified, time to wait for provisioning to finish (in seconds).
   - name: resourcePoolName
     required: false
     documentation: If specified, the resource will be created for the instance and placed into this pool.

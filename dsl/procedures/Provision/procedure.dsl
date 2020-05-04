@@ -17,14 +17,14 @@ procedure 'Provision', description: '''Creates one or more Virtual Machine insta
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
 
     formalOutputParameter 'instanceDetails',
-        description: 'Details of the Instance created.'
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: ba9d3825dfeb4155299b863e6001426a ===
+        description: '''Details of the Instance created.'''
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 893bdfbd631a98a265e2a1775e465a3d ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

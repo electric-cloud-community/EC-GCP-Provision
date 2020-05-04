@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on April 03, 2020</p>
+    <p>Revised on May 04, 2020</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -108,7 +108,7 @@
         </p>
 
         <h3>Creating Plugin Configurations</h3>
-        <p>To create plugin configurations in CloudBees Flow,
+        <p>To create plugin configurations in CloudBees CD,
             do these steps:</p>
 
         <li>Go to <b>Administration</b> &gt; <b>Plugins</b> to open the Plugin Manager.</li>
@@ -117,7 +117,8 @@
              Configurations page.</li>
         <li>Click <b>Create Configuration</b> as per the description of parameters below.</li>
         
-        Configuration Parameters
+
+        <h2>Configuration Procedure Parameters</h2>
         <table class="grid">
             <thead>
             <tr>
@@ -178,7 +179,7 @@
             <tr>
                 
                     <td >Check Connection?</td>
-                    <td>If checked, a connection endpoint and credentials will be tested before save. The configuration will not be saved if the test fails.</td>
+                    <td>If checked, the connection endpoint and credentials entered as part of the configuration will be tested. If this option is checked, configuration will not be saved if the test fails.</td>
                 
             </tr>
             
@@ -549,9 +550,15 @@ Options are as follows.<br/><br/><ul><li>None - No Service Account is used.</li>
             
             <tr>
                 
+                <td >Ping Resource?</td>
+                <td>If checked, the resource will be pinged and the job will finish successfully only when the resource is up and running.</td>
+                
+            </tr>
+            
+            <tr>
+                
                 <td >Timeout in Seconds</td>
-                <td>If specified, time to wait for provisioning to finish (in seconds).<br/>
-Note that resource availability is not checked during the time out period.
+                <td>If specified, time to wait for provisioning to finish (in seconds).
 </td>
                 
             </tr>
@@ -961,6 +968,13 @@ This procedure essentially calls the Delete Instance procedure followed by remov
     
 
     <h1 id="releaseNotes">Release Notes</h1>
+    
+    <h3>@PLUGIN_KEY@ 1.1.0</h3>
+    <ul>
+        
+        <li>Added pingResource parameter to the Provision procedure: now resource is pinged for availability.</li>
+        
+    </ul>
     
     <h3>@PLUGIN_KEY@ 1.0.0</h3>
     <ul>

@@ -17,11 +17,11 @@ procedure 'Reset Instances', description: '''Reset one or more Virtual Machine I
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 206bd1085f4957bfb042e511efe34495 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 81b3c284d797abd5a83fe46d11e7370a ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

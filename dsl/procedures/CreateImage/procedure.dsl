@@ -17,11 +17,11 @@ procedure 'Create Image', description: '''Creates a new Virtual Machine image in
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: ee787c6e5b971af4b4d01b20c9ffdf76 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 137f626fd16a16136bb7937c743f1622 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"
