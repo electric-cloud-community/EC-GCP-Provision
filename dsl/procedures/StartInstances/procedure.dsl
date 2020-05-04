@@ -17,14 +17,14 @@ procedure 'Start Instances', description: '''Starts one or more Virtual Machine 
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
 
     formalOutputParameter 'instances',
-        description: 'JSON representation of instances'
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 8321f67326639e1afca5360e93697ead ===
+        description: '''JSON representation of instances'''
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 70e61282a93538d513b42b9cc9a2f997 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

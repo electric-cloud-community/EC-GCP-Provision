@@ -17,11 +17,11 @@ procedure 'Stop Instances', description: '''Stops one or more Virtual Machine In
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: eea4604a571e0a6d39b78312d82670d9 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: de93a054d3009115f69bb22e37a773ea ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

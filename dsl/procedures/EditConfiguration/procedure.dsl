@@ -16,10 +16,10 @@ procedure 'EditConfiguration', description: 'Checks connection for the changed c
     step 'checkConnection',
         command: new File(pluginDir, "dsl/procedures/CreateConfiguration/steps/checkConnection.groovy").text,
         errorHandling: 'abortProcedure',
-        shell: 'ec-groovy',
+        shell: 'ec-groovy -cp $[/myJob/flowpdk_classpath]',
         postProcessor: '$[/myProject/perl/postpLoader]',
         resourceName: 'local',
         condition: '$[/javascript myJob.checkConnection == "true" || myJob.checkConnection == "1"]'
 
 }
-// DO NOT EDIT THIS BLOCK === configuration ends, checksum: 8d56f13035c6b86b76af357bd7dddc89 ===
+// DO NOT EDIT THIS BLOCK === configuration ends, checksum: a87427b04cff5e61480bc6cae5d6a33b ===

@@ -1,2 +1,4 @@
 1.0.0:
   - Introduced the EC-GCP-Provision plugin.
+1.1.0:
+  - 'Added pingResource parameter to the Provision procedure: now resource is pinged for availability.'

@@ -19,11 +19,11 @@ This procedure essentially calls the Delete Instance procedure followed by remov
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 215b5500a2abd33dd79aad35b0d82b86 ===
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: ac8e2ed7f66420b7197675cfc745c372 ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

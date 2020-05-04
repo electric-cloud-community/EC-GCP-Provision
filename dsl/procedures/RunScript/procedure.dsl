@@ -17,14 +17,14 @@ procedure 'Run Script', description: '''Runs a custom groovy script using the GC
         shell = 'ec-groovy'
         shell = 'ec-groovy -cp $[/myJob/flowpdk_classpath]'
 
-        resourceName = '$[flowpdkResource]'
+        resourceName = '$[/myJobStep/parent/steps/flowpdk-setup/flowpdkResource]'
 
         postProcessor = '''$[/myProject/perl/postpLoader]'''
     }
 
     formalOutputParameter 'output',
-        description: 'Some output parameter to use in the script. Evaluation result (the last value returned by the script) will be saved into this parameter.'
-// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: f5f21cd20b0a7332b96895f393ea8580 ===
+        description: '''Some output parameter to use in the script. Evaluation result (the last value returned by the script) will be saved into this parameter.'''
+// DO NOT EDIT THIS BLOCK === procedure_autogen ends, checksum: 132053ee7272826ca8600dfeb9bf19ec ===
 // Do not update the code above the line
 // procedure properties declaration can be placed in here, like
 // property 'property name', value: "value"

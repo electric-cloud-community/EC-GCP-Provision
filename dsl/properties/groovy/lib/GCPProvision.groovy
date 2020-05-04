@@ -222,6 +222,24 @@ class GCPProvision extends FlowPlugin {
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/instance_id", name)
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/config", param.config)
                 log.info "Created resource $name in the pool $resourcePool"
+                
+                if (param.pingResource == 'true') {
+                    def slept = 0
+                    def ready = false
+                    def sleepTime = 5
+                    while(!ready && slept < timeout) {
+                        sleep(sleepTime * 1000)
+                        slept += sleepTime
+                        log.info "Pinging resource $name (waiting for $slept seconds).."
+                        def state = FlowAPI.ec.pingResource(resourceName: name)
+                        if (state?.resource?.agentState?.alive == "1") {
+                            ready = true
+                        }
+                    }
+                    if (!ready) {
+                        throw new RuntimeException("Failed to bring resource up in $timeout seconds, resource is not ready yet")
+                    }
+                }
             }
         }
 
