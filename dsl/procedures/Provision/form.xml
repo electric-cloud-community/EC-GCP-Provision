@@ -167,19 +167,18 @@ Options are as follows.<br/><br/>
     <type>checkbox</type>
     <property>pingResource</property>
     <required>0</required>
+    <htmlDocumentation>If checked, the resource will be pinged and the job will finish successfully only when the resource is up and running.</htmlDocumentation>
     <label>Ping Resource?:</label>
     <value>false</value>
     <checkedValue>true</checkedValue>
     <condition>${resourcePoolName} != ""</condition>
     <dependsOn>resourcePoolName</dependsOn>
-    <documentatation>If checked, the resource will be pinged and the job will finish successfully only when the resource is up and running.</documentatation>
     <uncheckedValue>false</uncheckedValue>
   </formElement>
   <formElement>
     <type>integer</type>
     <property>waitTimeout</property>
-    <htmlDocumentation>If specified, time to wait for provisioning to finish (in seconds).<br/>
-Note that resource availability is not checked during the time out period.
+    <htmlDocumentation>If specified, time to wait for provisioning to finish (in seconds).
 </htmlDocumentation>
     <label>Timeout in Seconds:</label>
     <value>300</value>

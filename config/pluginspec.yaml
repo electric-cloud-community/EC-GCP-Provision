@@ -445,7 +445,7 @@ procedures:
     value: false
     checkedValue: true
     uncheckedValue: false
-    documentatation: If checked, the resource will be pinged and the job will finish successfully only when the resource is up and running.
+    htmlDocumentation: If checked, the resource will be pinged and the job will finish successfully only when the resource is up and running.
   - name: waitTimeout
     type: integer
     label: Timeout in Seconds

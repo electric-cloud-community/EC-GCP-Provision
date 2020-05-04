@@ -551,15 +551,14 @@ Options are as follows.<br/><br/><ul><li>None - No Service Account is used.</li>
             <tr>
                 
                 <td >Ping Resource?</td>
-                <td></td>
+                <td>If checked, the resource will be pinged and the job will finish successfully only when the resource is up and running.</td>
                 
             </tr>
             
             <tr>
                 
                 <td >Timeout in Seconds</td>
-                <td>If specified, time to wait for provisioning to finish (in seconds).<br/>
-Note that resource availability is not checked during the time out period.
+                <td>If specified, time to wait for provisioning to finish (in seconds).
 </td>
                 
             </tr>

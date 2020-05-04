@@ -222,7 +222,7 @@ class GCPProvision extends FlowPlugin {
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/instance_id", name)
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/config", param.config)
                 log.info "Created resource $name in the pool $resourcePool"
-                
+
                 if (param.pingResource == 'true') {
                     def slept = 0
                     def ready = false
