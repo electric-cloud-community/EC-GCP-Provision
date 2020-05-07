@@ -13,7 +13,7 @@ dependencies {
     implementation project(':GCPProvision')
 
     // Change the version if you have upgraded the groovy library
-    implementation 'com.electriccloud.plugins:flowpdf-groovy-lib:1.0.0.0'
+    implementation 'com.electriccloud.plugins:flowpdf-groovy-lib:1.0.1.0'
 }
 
 

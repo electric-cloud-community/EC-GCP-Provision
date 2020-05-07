@@ -1,5 +1,11 @@
+import com.cloudbees.flow.plugins.gcp.compute.CreateImageParameters
+import com.cloudbees.flow.plugins.gcp.compute.GCP
+import com.cloudbees.flow.plugins.gcp.compute.GCPOptions
+import com.cloudbees.flow.plugins.gcp.compute.ListInstancesParameters
+import com.cloudbees.flow.plugins.gcp.compute.ProvisionInstanceKey
+import com.cloudbees.flow.plugins.gcp.compute.ProvisionInstanceParameters
+import com.cloudbees.flow.plugins.gcp.compute.logger.FlowpdfLogger
 import com.cloudbees.flowpdf.*
-import com.cloudbees.flow.plugins.*
 import groovy.json.JsonBuilder
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -97,13 +103,13 @@ class GCPProvision extends FlowPlugin {
 
         if (param.useServiceAccount) {
             if (param.useServiceAccount == 'noAccount') {
-                parameters.serviceAccountType(ServiceAccountType.NO_ACCOUNT)
+                parameters.serviceAccountType(ProvisionInstanceParameters.ServiceAccountType.NO_ACCOUNT)
                 log.info "No service account will be used"
             } else if (param.useServiceAccount == 'sameAccount') {
-                parameters.serviceAccountType(ServiceAccountType.SAME)
+                parameters.serviceAccountType(ProvisionInstanceParameters.ServiceAccountType.SAME)
                 log.info "The same service account will be used for the machine"
             } else {
-                parameters.serviceAccountType(ServiceAccountType.DEFINED)
+                parameters.serviceAccountType(ProvisionInstanceParameters.ServiceAccountType.DEFINED)
                 if (!param.serviceAccountEmail) {
                     throw new RuntimeException("Service account email must be provided for the defined service account")
                 }
@@ -304,11 +310,26 @@ class GCPProvision extends FlowPlugin {
         Config config = context.getConfigValues()
         String key = config.getCredential('credential')?.secretValue
         if (!key) {
+            log.errorDiag("The key was not found in the plugin configuration. Please validate your plugin configuration.")
             throw new RuntimeException("The key is not found in the credential")
         }
-        String projectId = config.getRequiredParameter('projectId').value
+        String projectId = config.getParameter('projectId')?.value
+        if (!projectId) {
+            def keyParsed = new JsonSlurper().parseText(key)
+            projectId = keyParsed.get('project_id')
+        }
+        if (!projectId) {
+            log.errorDiag("Failed to get projectId from the plugin configuration. Make sure that your key is in correct JSON format.")
+            throw new RuntimeException("Failed to get projectId from the plugin configuration")
+        }
         String zone = config.getRequiredParameter('zone')
-        GCP gcp = new GCP(key, projectId, zone, false)
+
+        def options = GCPOptions.builder().projectId(projectId)
+            .zone(zone)
+            .ignoreSsl(false)
+            .logger(new FlowpdfLogger(log))
+            .build()
+        GCP gcp = new GCP(options)
         return gcp
     }()
 

@@ -3,7 +3,7 @@ pluginInfo:
   # Feel free to change it
   # Call flowpdk showdoc pluginspec to see the list of available fields and their description
   pluginName: 'EC-GCP-Provision'
-  version: '1.1.0'
+  version: '2.0.0'
   description: 'This plugin integrates with Google Cloud Platform to provision new resources from the pre-defined resource templates.'
   author: 'Polina'
   supportUrl: 'pshubina@cloudbees.com'
@@ -33,8 +33,8 @@ configuration:
     label: Description
   -
     name: projectId
-    documentation: Project ID of the project in GCP under which Instances are provisioned.
-    required: true
+    documentation: Project ID of the project in GCP under which Instances are provisioned. If not provided, will be taken from the key.
+    required: false
     type: entry
     label: Project Id
   -
@@ -153,19 +153,6 @@ procedures:
       documentation: Time (in seconds) to wait for instances to be deleted.
       value: 300
       type: integer
-#
-#- name: Cleanup Instances
-#  hasConfig: true
-#  parameters:
-#    - name: filter
-#      type: textarea
-#    - name: age
-#      type: entry
-#      documentation: Instance age in hours
-#    - name: dryRun
-#      type: checkbox
-#      checkedValue: true
-#      uncheckedValue: false
 
 - name: Run Script
   description: Runs a custom groovy script using the GCP client.
@@ -194,7 +181,6 @@ procedures:
 
   outputParameters:
     output: Some output parameter to use in the script. Evaluation result (the last value returned by the script) will be saved into this parameter.
-
 
 - name: Stop Instances
   hasConfig: true
@@ -285,42 +271,28 @@ procedures:
         Instance name.<br/>
         In case of multiple instances, specify one instance name per line.
 
-
-#- name: Update Instances
-#  hasConfig: true
-#  description: Updates instances parameters
-#  parameters:
-#    - name: instanceNames
-#      type: textarea
-#      required: true
-#      label: Instance Names
-#      documentation: Newline-separated instance names
-#    - name: networkTags
-#      type: textarea
-#      required: false
-#    - name: deletionProtection
-#      type: radio
-#      options:
-#        - name: retain
-#        - name: on
-#        - name: off
-
 -
-  name: 'Provision'
+  name: Provision
   description: Creates one or more Virtual Machine instances.
   hasConfig: true
 
-#  properties:
-#    ec_form:
-#      - propertyName: configurationParameterRef
-#        value: config
-#      - propertyName: usesConfigurationNameAsCredential
-#        value: 1
-#      - propertyName: parameterOptions
-#        credentialProtected: true
-#        properties:
-#          instanceType:
-#            path: 'dsl/procedures/Provision/instanceType.groovy'
+  properties:
+    ec_form:
+      - propertyName: configurationParameterRef
+        value: config
+      - propertyName: usesConfigurationNameAsCredential
+        value: 1
+      - propertyName: parameterOptions
+        credentialProtected: true
+        properties:
+          instanceType:
+            path: dsl/procedures/Provision/dropdowns.groovy
+          sourceImageFamily:
+            path: dsl/procedures/Provision/dropdowns.groovy
+          network:
+            path: dsl/procedures/Provision/dropdowns.groovy
+          subnetwork:
+            path: dsl/procedures/Provision/dropdowns.groovy
 
   outputParameters:
     instanceDetails: Details of the Instance created.
@@ -339,6 +311,7 @@ procedures:
     label: Instance Type
     type: entry
     documentation: Instance type, e.g. n1-standard-2
+    serverOptions: 1
   - name: sourceImage
     required: false
     type: entry
@@ -354,6 +327,8 @@ procedures:
   - name: sourceImageFamily
     label: Source Image Family
     type: entry
+    serverOptions: 1
+    dependsOn: config
     htmlDocumentation: |
       Source Image family.<br/>
       Either the family or a URL should be provided.
@@ -361,6 +336,7 @@ procedures:
     type: textarea
     required: false
     label: Keys
+#    todo fix multiple keys
     documentation: |
       SSH keys in JSON format, e.g. [{"userName": "user", "key": "ssh-rsa ....."}]
   - name: network
@@ -368,16 +344,21 @@ procedures:
     required: true
     type: entry
     label: Network
+    dependsOn: config
+    serverOptions: 1
     documentation: The name of the VPC network, e.g. default.
   - name: subnetwork
     required: true
     label: Subnetwork
+    serverOptions: 1
+    dependsOn: config,network
     documentation: The name of the VPC subnetwork
     value: default
   - name: diskSize
     required: false
     type: integer
     label: Disk Size
+#    todo validate no less than image size
     documentation: Instace disk size in Gb
   - name: instanceTags
     type: textarea
@@ -460,6 +441,7 @@ procedures:
   - name: resourcePort
     required: false
     value: 7800
+    label: Resource Port
     type: entry
     documentation: Agent port for the created resource.
     dependsOn: resourcePoolName

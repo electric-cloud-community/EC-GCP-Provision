@@ -6,3 +6,4 @@ build/
 specs/logs
 specs/spec-report
 *.bak
+out/
