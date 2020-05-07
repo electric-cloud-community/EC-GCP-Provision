@@ -132,7 +132,6 @@ class GCPProvision extends FlowPlugin {
 
         parameters.hostname(param.instanceHostname)
 
-
         if (param.keys) {
             List mapKeys = new JsonSlurper().parseText(param.keys)
             List<ProvisionInstanceKey> keys = []
@@ -195,6 +194,8 @@ class GCPProvision extends FlowPlugin {
                 log.info "Created resource $name in zone $zone, pool $resourcePool"
                 String me = '$[/myJob/launchedByUser]'
 
+                log.info "Launched by user: $me"
+
                 try {
                     FlowAPI.ec.createAclEntry(
                         principalType: 'user',
@@ -209,20 +210,21 @@ class GCPProvision extends FlowPlugin {
                 catch (Throwable e) {
                     log.info("Failed to grant ACL for the principal project: @PLUGIN_NAME@ at the resource: ${e.message}")
                 }
-                try {
+                if (me) {
 
-
-                    FlowAPI.ec.createAclEntry(
-                        principalType: 'user',
-                        principalName: me,
-                        modifyPrivilege: 'allow',
-                        readPrivilege: 'allow',
-                        changePermissionPrivilege: 'allow',
-                        executePrivilege: 'allow',
-                        resourceName: name
-                    )
-                } catch (Throwable e) {
-                    log.info "Failed to grant ACL for $me: ${e.message}"
+                    try {
+                        FlowAPI.ec.createAclEntry(
+                            principalType: 'user',
+                            principalName: me,
+                            modifyPrivilege: 'allow',
+                            readPrivilege: 'allow',
+                            changePermissionPrivilege: 'allow',
+                            executePrivilege: 'allow',
+                            resourceName: name
+                        )
+                    } catch (Throwable e) {
+                        log.info "Failed to grant ACL for $me: ${e.message}"
+                    }
                 }
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/createdBy", "@PLUGIN_KEY@")
                 FlowAPI.setFlowProperty("/resources/$name/ec_cloud_instance_details/instance_id", name)
@@ -328,27 +330,21 @@ class GCPProvision extends FlowPlugin {
             .zone(zone)
             .ignoreSsl(false)
             .logger(new FlowpdfLogger(log))
+            .key(key)
             .build()
         GCP gcp = new GCP(options)
         return gcp
     }()
 
 
-/**
- * teardown - Teardown/Teardown
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param resName (required: true)
+    /**
+     * teardown - Teardown/Teardown
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param resName (required: true)
 
- */
+     */
     def teardown(StepParameters p, StepResult sr) {
-
-        /* Log is automatically available from the parent class */
-        log.info(
-            "teardown was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
 
         String resourceName = p.getRequiredParameter('resName').value
 

@@ -1,12 +1,13 @@
 package com.cloudbees.flow.plugins.gcp.compute
 
+import spock.lang.Shared
 import spock.lang.Unroll
 
 
 class DynamicDropdownHandlerTest extends SpecHelper {
-    DynamicDropdownHandler handler
+    @Shared DynamicDropdownHandler handler
 
-    def setup() {
+    def setupSpec() {
         handler =  DynamicDropdownHandler.getInstance([
             configurationParameters: [
                 zone: zone,
@@ -41,8 +42,18 @@ class DynamicDropdownHandlerTest extends SpecHelper {
         when:
         def families = handler.listFamilies(project)
         then:
-        assert families.size()
+        families.each {
+            println it.value
+        }
+        assert families.size() > 0
         where:
-        project << ['windows-cloud', 'centos-cloud']
+        project<< handler.listImageProject().collect { it.value }
+    }
+
+    def 'list projects'() {
+        when:
+        def projects = handler.listImageProject()
+        then:
+        assert projects
     }
 }

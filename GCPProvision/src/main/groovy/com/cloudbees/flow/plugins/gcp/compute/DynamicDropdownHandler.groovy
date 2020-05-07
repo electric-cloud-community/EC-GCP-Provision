@@ -62,6 +62,16 @@ class DynamicDropdownHandler {
         }
     }
 
+    List<SelectOption> listImageProject() {
+        return ['centos-cloud', 'cos-cloud',
+         'debian-cloud', 'rhel-cloud', 'rhel-sap-cloud',
+         'suse-cloud', 'suse-sap-cloud', 'ubuntu-os-cloud', 'windows-cloud', 'windows-sql-cloud',
+         'ubuntu-os-cloud', this.gcp.projectId].sort().collect {
+            new SelectOption(name: it, value: it)
+        }
+    }
+
+
     class SelectOption {
         String name
         String value

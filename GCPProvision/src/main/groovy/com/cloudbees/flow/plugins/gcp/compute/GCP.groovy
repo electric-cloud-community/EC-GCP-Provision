@@ -136,28 +136,40 @@ class GCP {
 
 
     Operation provisionInstance(ProvisionInstanceParameters p) {
+        String zone = p.zoneName ?: zone
+        log.debug "Zone is $zone"
+
         Instance instance = new Instance()
         String instanceName = p.instanceName
         if (!instanceName) {
-            throw new RuntimeException("instanceName uis not provided")
+            throw new RuntimeException("instanceName is not provided")
         }
         instance.setName(p.instanceName)
+        log.debug "Instance name is ${instance.getName()}"
 
         instance.setDescription(p.description ?: "Provisioned automatically by EC-GCP-Provision CloudBees Flow plugin")
+        log.debug "Description: ${instance.getDescription()}"
 
         String instanceType = p.instanceType ?: 'n1-standard-1'
         instance.setMachineType(
             "https://www.googleapis.com/compute/v1/projects/"
-                + p.projectId + "/zones/" + p.zoneName + "/machineTypes/" + instanceType)
-
+                + projectId + "/zones/" + zone + "/machineTypes/" + instanceType)
+        log.debug "Type: ${instance.getMachineType()}"
 
         NetworkInterface ifc = new NetworkInterface();
         String networkName = p.network ?: 'default'
         ifc.setNetwork("https://www.googleapis.com/compute/v1/projects/" +
-            p.projectId + "/global/networks/${networkName}");
+            projectId + "/global/networks/${networkName}");
         List<AccessConfig> configs = new ArrayList<>()
+
+
         if (p.subnetwork) {
-            ifc.setSubnetwork("projects/${p.projectId}/regions/${p.regionName}/subnetworks/${p.subnetwork}")
+            String region = p.regionName ?: region
+            if (!region) {
+                throw new RuntimeException("Region is not provided")
+            }
+            ifc.setSubnetwork("projects/${projectId}/regions/${region}/subnetworks/${p.subnetwork}")
+            log.debug "Subnetwork: ${ifc.getSubnetwork()}"
         }
 
         if (p.assignPublicIp) {
@@ -169,6 +181,7 @@ class GCP {
         }
         if (p.deletionProtection) {
             instance.setDeletionProtection(true)
+            log.debug "Set deletion protection"
         }
 
         ifc.setAccessConfigs(configs)
@@ -177,13 +190,14 @@ class GCP {
         if (p.tags) {
             Tags tags = Tags.newInstance().setItems(p.tags)
             instance.setTags(tags)
+            log.debug "Tag: $tags"
         }
 
         //// Initialize the service account to be used by the VM Instance and set the API access scopes.
 
-        if (p.serviceAccountType in [ServiceAccountType.DEFINED, ServiceAccountType.SAME]) {
+        if (p.serviceAccountType in [ProvisionInstanceParameters.ServiceAccountType.DEFINED, ProvisionInstanceParameters.ServiceAccountType.SAME]) {
             ServiceAccount account = new ServiceAccount()
-            String email = ServiceAccountType.DEFINED ? p.serviceAccountEmail : getServiceAccountEmail()
+            String email = ProvisionInstanceParameters.ServiceAccountType.DEFINED ? p.serviceAccountEmail : getServiceAccountEmail()
             if (!email) {
                 throw new RuntimeException("Service account email is not provided for the service account type ${p.serviceAccountType}")
             }
@@ -209,20 +223,23 @@ class GCP {
         // Specify the source operating system machine image to be used by the VM Instance.
         if (p.sourceImage) {
             params.setSourceImage(p.sourceImage.getSelfLink())
-            //todo log
+
         } else {
             String sourceImage = p.sourceImageUrl ?: SOURCE_IMAGE_PATH
             params.setSourceImage(SOURCE_IMAGE_PREFIX + sourceImage)
         }
+        log.debug "Set source image ${params.getSourceImage()}"
         // Specify the disk type as Standard Persistent Disk
         params.setDiskType("https://www.googleapis.com/compute/v1/projects/"
-            + p.projectId + "/zones/"
-            + p.zoneName + "/diskTypes/pd-standard")
+            + projectId + "/zones/"
+            + zone + "/diskTypes/pd-standard")
         if (p.diskSizeGb) {
             params.setDiskSizeGb(p.diskSizeGb)
         }
 
-        disk.setInitializeParams(params);
+        log.debug "Disk params: ${params}"
+
+        disk.setInitializeParams(params)
         instance.setDisks(Collections.singletonList(disk))
 
         //Adding ssh keys
@@ -231,7 +248,7 @@ class GCP {
         if (p.keys) {
             def keyStrings = []
             for (ProvisionInstanceKey key in p.keys) {
-                String keyString = "$key.userName: $key.key $key.userName"
+                String keyString = "$key.userName:$key.key"
                 keyStrings << keyString
             }
             Metadata.Items item = new Metadata.Items();
@@ -239,13 +256,17 @@ class GCP {
             item.setValue(keyStrings.join("\n"))
             items << item
         }
+
+        log.debug "Metadata: ${metadata}"
         if (p.hostname) {
             instance.setHostname(p.hostname)
         }
         metadata.setItems(items)
         instance.setMetadata(metadata)
 
-        Compute.Instances.Insert insert = compute.instances().insert(p.projectId, p.zoneName, instance);
+        log.debug "Instance: $instance"
+
+        Compute.Instances.Insert insert = compute.instances().insert(projectId, zone, instance);
         Operation operation = insert.execute()
         return operation
     }

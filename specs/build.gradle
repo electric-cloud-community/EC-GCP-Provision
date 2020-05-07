@@ -1,0 +1,75 @@
+
+apply plugin: "groovy"
+apply plugin: 'idea'
+
+version = "1.0"
+description = "EC-GCP-Provision Specs"
+
+sourceCompatibility = 1.8
+
+defaultTasks 'test'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url  "https://dl.bintray.com/ecpluginsdev/maven"
+    }
+    flatDir {
+        dirs '../agent/deps/libs'
+    }
+
+}
+
+
+ext {
+    lombokVersion = "1.18.2"
+    jacksonVersion = "2.10.3"
+}
+
+
+dependencies {
+    implementation 'org.codehaus.groovy:groovy-all:2.4.5:indy'
+    implementation 'org.spockframework:spock-core:1.1-groovy-2.4'
+    implementation 'com.jayway.restassured:rest-assured:2.4.0'
+
+    implementation 'com.electriccloud:ec-specs-plugins-core:1.9.1'
+
+    testCompile( 'com.athaydes:spock-reports:1.6.0' ) {
+        transitive = false // this avoids affecting your semver of Groovy/Spock
+    }
+
+    compile project(':GCPProvision')
+
+}
+
+test {
+    systemProperty 'com.athaydes.spockframework.report.showCodeBlocks', true
+
+    def server = findProperty('server') ?: findProperty('COMMANDER_SERVER') ?: findProperty('commanderServer') ?: 'localhost'
+    systemProperties['COMMANDER_SERVER'] = server
+    def secure = findProperty('secure') ?: findProperty('COMMANDER_SECURE') ?: findProperty('commanderSecure') ?: 1
+    systemProperties["COMMANDER_SECURE"] = secure
+    def password = findProperty('password')
+    systemProperties["COMMANDER_PASSWORD"] = password ?: 'changeme'
+
+    testLogging {
+        showStandardStreams = true
+//        exceptionFormat = 'full'
+    }
+    outputs.upToDateWhen { false }
+    systemProperties['EC_SPECS_CLI'] = true
+
+    def destination = findProperty('reportDestination') ?: "spec-report"
+    if (destination) {
+        reports {
+            // html.destination = "$destination/spock-report"
+            html.setDestination(new File("$destination/spock-report"))
+        }
+        systemProperty 'com.athaydes.spockframework.report.outputDir', destination
+    }
+}
+
+test.dependsOn = [
+    ':rollout-api-client:test'
+]
