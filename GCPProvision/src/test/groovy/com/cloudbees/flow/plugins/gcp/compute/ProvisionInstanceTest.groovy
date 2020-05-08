@@ -1,5 +1,6 @@
 package com.cloudbees.flow.plugins.gcp.compute
 
+import groovy.json.JsonSlurper
 import spock.lang.Shared
 
 
@@ -82,5 +83,17 @@ class ProvisionInstanceTest extends SpecHelper {
         def instance = gcp.getInstance(instanceName)
         def ip = gcp.getInstanceExternalIp(instanceName)
         assert ip
+    }
+
+    def 'provision with service account'() {
+        setup:
+        genericParameters.serviceAccountType = ProvisionInstanceParameters.ServiceAccountType.SAME
+        when:
+        def op = gcp.provisionInstance(genericParameters)
+        then:
+        def instance = gcp.getInstance(instanceName)
+        def acc = instance.getServiceAccounts().first()
+        def expectedEmail = new JsonSlurper().parseText(key)?.get('client_email')
+        assert acc.getEmail() == expectedEmail
     }
 }

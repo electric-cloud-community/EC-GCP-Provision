@@ -197,7 +197,7 @@ class GCP {
 
         if (p.serviceAccountType in [ProvisionInstanceParameters.ServiceAccountType.DEFINED, ProvisionInstanceParameters.ServiceAccountType.SAME]) {
             ServiceAccount account = new ServiceAccount()
-            String email = ProvisionInstanceParameters.ServiceAccountType.DEFINED ? p.serviceAccountEmail : getServiceAccountEmail()
+            String email = p.serviceAccountType == ProvisionInstanceParameters.ServiceAccountType.DEFINED ? p.serviceAccountEmail : getServiceAccountEmail()
             if (!email) {
                 throw new RuntimeException("Service account email is not provided for the service account type ${p.serviceAccountType}")
             }
@@ -206,6 +206,7 @@ class GCP {
             scopes.add("https://www.googleapis.com/auth/devstorage.full_control")
             scopes.add("https://www.googleapis.com/auth/compute")
             account.setScopes(scopes)
+            log.debug("Using service account $account")
             instance.setServiceAccounts(Collections.singletonList(account))
         }
 

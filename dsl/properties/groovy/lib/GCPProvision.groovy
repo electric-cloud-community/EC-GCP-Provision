@@ -32,30 +32,22 @@ class GCPProvision extends FlowPlugin {
     }
 
 
-/**
- * provision - Provision/Provision
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceType (required: true)
- * @param sourceImage (required: true)
- * @param keys (required: false)
- * @param network (required: true)
- * @param subnetwork (required: true)
- * @param diskSize (required: false)
- * @param assignPublicIp (required: false)
- * @param count (required: false)
- * @param resourcePoolName (required: false)
+    /**
+     * provision - Provision/Provision
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param instanceType (required: true)
+     * @param sourceImage (required: true)
+     * @param keys (required: false)
+     * @param network (required: true)
+     * @param subnetwork (required: true)
+     * @param diskSize (required: false)
+     * @param assignPublicIp (required: false)
+     * @param count (required: false)
+     * @param resourcePoolName (required: false)
 
- */
+     */
     def provision(StepParameters p, StepResult sr) {
-        /* Log is automatically available from the parent class */
-        log.info(
-            "provision was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
-
-
         Map<String, String> param = p.asMap
 
         for (String key : param.keySet()) {
@@ -162,7 +154,13 @@ class GCPProvision extends FlowPlugin {
             log.info("Launched operation: ${operation.getName()}")
             operations.add(operation)
         }
-        int timeout = p.getParameter('waitTimeout')?.value as int ?: 300
+
+        int timeout = 300
+        try {
+            timeout = Integer.parseInt(p.getParameter('waitTimeout')?.value)
+        } catch (Throwable ignore) {
+
+        }
         operations.each {
             gcp.blockUntilComplete(it, timeout * 1000)
         }
@@ -235,7 +233,7 @@ class GCPProvision extends FlowPlugin {
                     def slept = 0
                     def ready = false
                     def sleepTime = 5
-                    while(!ready && slept < timeout) {
+                    while (!ready && slept < timeout) {
                         sleep(sleepTime * 1000)
                         slept += sleepTime
                         log.info "Pinging resource $name (waiting for $slept seconds).."
@@ -422,13 +420,13 @@ class GCPProvision extends FlowPlugin {
         }
     }
 
-/**
- * runScript - Run Script/Run Script
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param script (required: )
+    /**
+     * runScript - Run Script/Run Script
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param script (required: )
 
- */
+     */
     def runScript(StepParameters p, StepResult sr) {
 
         /* Log is automatically available from the parent class */
@@ -453,13 +451,13 @@ class GCPProvision extends FlowPlugin {
         }
     }
 
-/**
- * stopInstance - Stop Instance/Stop Instance
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceName (required: true)
+    /**
+     * stopInstance - Stop Instance/Stop Instance
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param instanceName (required: true)
 
- */
+     */
     def stopInstance(StepParameters p, StepResult sr) {
 
         /* Log is automatically available from the parent class */
@@ -475,25 +473,17 @@ class GCPProvision extends FlowPlugin {
     }
 
 
-/**
- * listInstances - List Instances/List Instances
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param filter (required: false)
- * @param maxResults (required: )
- * @param orderBy (required: false)
- * @param resultProperty (required: true)
+    /**
+     * listInstances - List Instances/List Instances
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param filter (required: false)
+     * @param maxResults (required: )
+     * @param orderBy (required: false)
+     * @param resultProperty (required: true)
 
- */
+     */
     def listInstances(StepParameters p, StepResult sr) {
-
-        /* Log is automatically available from the parent class */
-        log.info(
-            "listInstances was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
-
         def param = ListInstancesParameters.builder()
         Map pMap = p.asMap
 
@@ -531,23 +521,15 @@ class GCPProvision extends FlowPlugin {
         sr.setOutputParameter("instances", json)
     }
 
-/**
- * deleteInstances - Delete Machines/Delete Machines
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceNames (required: true)
- * @param timeoutSeconds (required: )
+    /**
+     * deleteInstances - Delete Machines/Delete Machines
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param instanceNames (required: true)
+     * @param timeoutSeconds (required: )
 
- */
+     */
     def deleteInstances(StepParameters p, StepResult sr) {
-
-        /* Log is automatically available from the parent class */
-        log.info(
-            "deleteMachines was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
-
         String instanceNames = p.getRequiredParameter('instanceNames').value
         int timeout = p.getRequiredParameter('timeoutSeconds').value as int
 
@@ -572,23 +554,16 @@ class GCPProvision extends FlowPlugin {
         }
     }
 
-/**
- * cleanupInstances - Cleanup Instances/Cleanup Instances
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param filter (required: )
- * @param age (required: )
- * @param dryRun (required: )
+    /**
+     * cleanupInstances - Cleanup Instances/Cleanup Instances
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param filter (required: )
+     * @param age (required: )
+     * @param dryRun (required: )
 
- */
+     */
     def cleanupInstances(StepParameters p, StepResult sr) {
-
-        /* Log is automatically available from the parent class */
-        log.info(
-            "cleanupInstances was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
 
         //2020-01-28T07:14:14.593-08:00",
         Date now = new Date()
@@ -611,21 +586,14 @@ class GCPProvision extends FlowPlugin {
         }
     }
 
-/**
- * resetInstances - Reset Instances/Reset Instances
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceNames (required: true)
+    /**
+     * resetInstances - Reset Instances/Reset Instances
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param instanceNames (required: true)
 
- */
+     */
     def resetInstances(StepParameters p, StepResult sr) {
-
-        /* Log is automatically available from the parent class */
-        log.info(
-            "resetInstances was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
 
         String instanceNames = p.getRequiredParameter('instanceNames').value
         def operations = instanceNames.split(/\s*\n+\s*/).collect { name ->
@@ -639,21 +607,15 @@ class GCPProvision extends FlowPlugin {
         }
     }
 
-/**
- * stopInstances - Stop Instances/Stop Instances
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceNames (required: true)
+    /**
+     * stopInstances - Stop Instances/Stop Instances
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param instanceNames (required: true)
 
- */
+     */
     def stopInstances(StepParameters p, StepResult sr) {
 
-        /* Log is automatically available from the parent class */
-        log.info(
-            "stopInstances was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
 
         String names = p.getRequiredParameter('instanceNames').value
         def operations = []
@@ -676,23 +638,15 @@ class GCPProvision extends FlowPlugin {
         }
     }
 
-/**
- * startInstances - Start Instances/Start Instances
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param instanceNames (required: true)
- * @param resultProperty (required: true)
+    /**
+     * startInstances - Start Instances/Start Instances
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param instanceNames (required: true)
+     * @param resultProperty (required: true)
 
- */
+     */
     def startInstances(StepParameters p, StepResult sr) {
-        /* Log is automatically available from the parent class */
-        log.info(
-            "startInstances was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            p.toString()
-        )
-
-
         String names = p.getRequiredParameter('instanceNames').value
         def operations = []
         def instanceNames = []
@@ -717,30 +671,23 @@ class GCPProvision extends FlowPlugin {
         FlowAPI.setFlowProperty("$resultProperty/json", prettyJson)
     }
 
-/**
- * createImage - Create Image/Create Image
- * Add your code into this method and it will be called when the step runs
- * @param config (required: true)
- * @param family (required: false)
- * @param name (required: false)
- * @param source (required: )
- * @param sourceDisk (required: false)
- * @param zone (required: false)
- * @param sourceSnapshot (required: false)
- * @param sourceImage (required: false)
- * @param description (required: false)
- * @param diskSizeGb (required: false)
- * @param deprecateOld (required: )
+    /**
+     * createImage - Create Image/Create Image
+     * Add your code into this method and it will be called when the step runs
+     * @param config (required: true)
+     * @param family (required: false)
+     * @param name (required: false)
+     * @param source (required: )
+     * @param sourceDisk (required: false)
+     * @param zone (required: false)
+     * @param sourceSnapshot (required: false)
+     * @param sourceImage (required: false)
+     * @param description (required: false)
+     * @param diskSizeGb (required: false)
+     * @param deprecateOld (required: )
 
- */
+     */
     def createImage(StepParameters parameters, StepResult sr) {
-
-        /* Log is automatically available from the parent class */
-        log.info(
-            "createImage was invoked with StepParameters",
-            /* runtimeParameters contains both configuration and procedure parameters */
-            parameters.toString()
-        )
 
         Map<String, String> p = parameters.asMap
         CreateImageParameters createImageParameters = CreateImageParameters
@@ -772,7 +719,7 @@ class GCPProvision extends FlowPlugin {
         }
     }
 
-// === step ends ===
+    // === step ends ===
 
     String getRuntimeLink() {
         String jobId = System.getenv('COMMANDER_JOBID')

@@ -13,12 +13,20 @@ project projName, {
             params.each { name, defValue ->
                 actualParameter name, '$[' + name + ']'
             }
+            if (procName == 'Provision') {
+                actualParameter 'resourcePoolName', '$[' + 'resPoolName]'
+            }
         }
 
         params.each { name, defValue ->
             formalParameter name, defaultValue: defValue, {
                 type = 'textarea'
             }
+
+        }
+
+        formalParameter 'resPoolName', {
+            type = 'textarea'
         }
     }
 }

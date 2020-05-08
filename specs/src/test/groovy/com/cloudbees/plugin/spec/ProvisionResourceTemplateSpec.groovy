@@ -1,27 +1,46 @@
 package com.cloudbees.plugin.spec
 
 import spock.lang.Shared
+import spock.lang.Stepwise
 
+@Stepwise
 class ProvisionResourceTemplateSpec extends PluginTestHelper {
     @Shared String projName = 'gcp-provision-specs'
+    @Shared String envName = randomize('test-env')
 
     def setupSpec() {
+        switchAdmin()
         createConfig(CONFIG_NAME)
-    }
-    def 'provision res template'() {
-        setup:
-        def name = randomize("template")
+
         dslFile("dsl/resTemplate.dsl", [
             config: CONFIG_NAME,
             projName: projName,
-            name: name,
-            envTemplateName: name
+            name: envName,
+            envTemplateName: envName
         ])
-        when:
-        def envName = randomize('test-env')
-        def result = provisionEnvironment(projName, name, envName)
-        assert result.outcome == 'success'
-        then:
-        assert true
+
+        switchUser()
+
+
     }
+
+    def cleanupSpec() {
+        switchAdmin()
+    }
+
+    def 'provision res template'() {
+        when:
+        def result = provisionEnvironment(projName, envName, envName)
+        then:
+        assert result.outcome == 'success'
+
+    }
+
+    def 'teardown environemnt'() {
+        when:
+        def result = tearDownEnvironment(projName, envName)
+        then:
+        assert result.outcome == 'success'
+    }
+
 }

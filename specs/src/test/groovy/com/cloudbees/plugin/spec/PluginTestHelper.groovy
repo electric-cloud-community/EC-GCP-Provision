@@ -2,6 +2,7 @@ package com.cloudbees.plugin.spec
 
 import com.cloudbees.flow.plugins.gcp.compute.GCP
 import com.cloudbees.flow.plugins.gcp.compute.GCPOptions
+import com.cloudbees.flow.plugins.gcp.compute.ProvisionInstanceParameters
 import com.electriccloud.spec.PluginSpockTestSupport
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
@@ -19,7 +20,7 @@ class PluginTestHelper extends PluginSpockTestSupport {
     def createConfig(configName) {
         createPluginConfiguration(pluginName,
             configName,
-            [desc: "test configuration", checkConnection: "0",
+            [desc     : "test configuration", checkConnection: "0",
              projectId: getProjectId(), zone: getZone()],
             "admin", getKey())
     }
@@ -59,7 +60,7 @@ class PluginTestHelper extends PluginSpockTestSupport {
 
 
     List<Map> getFormalParameterOptions(String pluginName, String procedureName, String parameterName, Map actualParameters) {
-        String params = actualParameters.collect {k, v -> "$k: '$v'"}.join(",")
+        String params = actualParameters.collect { k, v -> "$k: '$v'" }.join(",")
         String script = """
 getFormalParameterOptions formalParameterName: '$parameterName',
     projectName: '/plugins/$pluginName/project',
@@ -71,7 +72,9 @@ getFormalParameterOptions formalParameterName: '$parameterName',
     }
 
     GCP buildGCP() {
-        return new GCP(GCPOptions.builder().key(getKey()).zone(getZone()).build())
+        def token = System.getenv("GCP_KEY")
+        assert token
+        return new GCP(GCPOptions.builder().key(token).zone(getZone()).build())
     }
 
     def provisionEnvironment(projectName, templateName, environmentName) {
@@ -97,6 +100,88 @@ getFormalParameterOptions formalParameterName: '$parameterName',
         def outcome = jobStatus(result.jobId).outcome
         def logs = readJobLogs(result.jobId)
         return [jobId: result.jobId, logs: logs, outcome: outcome]
+    }
+
+
+    def switchUser() {
+        String userName = 'gcp-provision-spec-user'
+
+        try {
+            dsl """
+                createUser userName: "$userName", email: '$userName', password: "$userName"
+            """
+            println ":Created user $userName"
+        } catch (Throwable e) {
+
+        }
+        //ACL
+
+        def allowAll = """
+ changePermissionsPrivilege = 'allow'
+ executePrivilege = 'allow'
+ modifyPrivilege = 'allow'
+ readPrivilege = 'allow'
+"""
+
+        dsl """
+aclEntry principalType: 'user', principalName: '$userName', {
+    systemObjectName = 'projects'
+    objectType = 'systemObject'
+$allowAll
+}
+
+
+aclEntry principalType: 'user', principalName: '$userName', {
+    systemObjectName = 'resources'
+    objectType = 'systemObject'
+$allowAll
+}
+
+
+aclEntry principalType: 'user', principalName: '$userName', {
+    zoneName = 'default'
+    objectType = 'zone'
+$allowAll
+}
+
+"""
+        login(userName, userName)
+    }
+
+    def switchAdmin() {
+        def userName = System.getProperty("COMMANDER_USER", "admin")
+        def password = System.getProperty("COMMANDER_PASSWORD", "changeme")
+        login(userName, password)
+    }
+
+    def ignoreDepCache(ignore) {
+        if (ignore) {
+            dsl "setProperty '/plugins/$pluginName/project/__ignore_dependencies_cache', value: '1'"
+        } else {
+            try {
+                dsl "deleteProperty '/plugins/$pluginName/project/__ignore_dependencies_cache'"
+            } catch (Throwable e) {
+
+            }
+        }
+    }
+
+    def provisionSample(wait = false) {
+        def gcp = buildGCP()
+        def name = 'spec-instance-' + new Random().nextInt()
+        def p = ProvisionInstanceParameters.builder()
+            .instanceType('f1-micro')
+            .sourceImage(gcp.getFromFamily('debian-cloud', 'debian-10'))
+            .network('default')
+            .subnetwork('default')
+            .diskSizeGb(20)
+            .instanceName(name)
+            .build()
+        def op = gcp.provisionInstance(p)
+        if (wait) {
+            gcp.blockUntilComplete(op, 30 * 1000)
+        }
+        return gcp.getInstance(name)
     }
 
 }
