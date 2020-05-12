@@ -77,9 +77,7 @@ getFormalParameterOptions formalParameterName: '$parameterName',
     }
 
     GCP buildGCP() {
-        def token = System.getenv("GCP_KEY")
-        assert token
-        return new GCP(GCPOptions.builder().key(token).zone(getZone()).build())
+        return new GCP(GCPOptions.builder().key(key).zone(getZone()).build())
     }
 
     def provisionEnvironment(projectName, templateName, environmentName) {
