@@ -43,6 +43,11 @@ dependencies {
 
 }
 
+
+task wrapper(type: Wrapper) {
+    //gradleVersion = '6.0' //version required
+}
+
 test {
     systemProperty 'com.athaydes.spockframework.report.showCodeBlocks', true
 
@@ -55,7 +60,6 @@ test {
 
     testLogging {
         showStandardStreams = true
-//        exceptionFormat = 'full'
     }
     outputs.upToDateWhen { false }
     systemProperties['EC_SPECS_CLI'] = true
