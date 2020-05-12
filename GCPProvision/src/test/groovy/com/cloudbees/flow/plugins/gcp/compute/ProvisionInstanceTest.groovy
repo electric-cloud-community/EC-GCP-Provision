@@ -57,7 +57,7 @@ class ProvisionInstanceTest extends SpecHelper {
         def operation = gcp.provisionInstance(genericParameters)
         then:
         def instance = gcp.getInstance(instanceName)
-        def keys =  instance.getMetadata().getItems().find { it.getKey() == 'ssh-keys' }
+        def keys =  instance.getMetadata().getItems().find { it.getKey() == 'ssh-keys' }?.getValue()
         assert keys == "imago:$key1\nimago:$key2"
     }
 
