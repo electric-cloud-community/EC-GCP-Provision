@@ -39,7 +39,8 @@ class PluginTestHelper extends PluginSpockTestSupport {
         return id
     }
 
-    String getKey() {
+
+    String getKeyClean() {
         def key = System.getenv("GCP_KEY")
         if (!key) {
             key = System.getenv('GCP_KEY_BASE64')
@@ -47,6 +48,11 @@ class PluginTestHelper extends PluginSpockTestSupport {
             key = new String(key.decodeBase64())
             key.trim()
         }
+        return key
+    }
+
+    String getKey() {
+        def key = getKeyClean()
         def parsed = new JsonSlurper().parseText(key)
         JsonOutput.toJson(parsed).replaceAll(/\\n/, /\\\\n/)
     }
@@ -77,7 +83,7 @@ getFormalParameterOptions formalParameterName: '$parameterName',
     }
 
     GCP buildGCP() {
-        return new GCP(GCPOptions.builder().key(key).zone(getZone()).build())
+        return new GCP(GCPOptions.builder().key(getKeyClean()).zone(getZone()).build())
     }
 
     def provisionEnvironment(projectName, templateName, environmentName) {
