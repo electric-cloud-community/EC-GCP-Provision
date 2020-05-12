@@ -16,7 +16,7 @@ class ProvisionSpec extends PluginTestHelper {
     @Shared
     def subnetwork = 'default'
     @Shared
-    GCP gcp = buildGCP()
+    GCP gcp
 
     def setupSpec() {
         switchAdmin()
@@ -52,6 +52,7 @@ class ProvisionSpec extends PluginTestHelper {
         )
 
         switchUser()
+        gcp = buildGCP()
     }
 
     def cleanupSpec() {
