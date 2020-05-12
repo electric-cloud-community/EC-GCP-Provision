@@ -71,5 +71,5 @@ test {
 }
 
 test.dependsOn = [
-    ':rollout-api-client:test'
+    ':GCPProvision:test'
 ]

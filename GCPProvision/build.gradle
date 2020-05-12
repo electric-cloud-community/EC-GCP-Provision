@@ -1,5 +1,6 @@
 plugins {
     id 'groovy'
+    id 'java-library'
 }
 
 group 'com.cloudbees.flow.plugins'
@@ -13,15 +14,14 @@ repositories {
     flatDir {
         dirs '../agent/deps/libs'
     }
-
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.11'
 
-    implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.30.9'
-    implementation group: 'com.google.apis', name: 'google-api-services-compute', version: 'v1-rev20200331-1.30.9'
-    implementation group: 'com.google.auth', name: 'google-auth-library-oauth2-http', version: '0.20.0'
+    api group: 'com.google.api-client', name: 'google-api-client', version: '1.30.9'
+    api group: 'com.google.apis', name: 'google-api-services-compute', version: 'v1-rev20200331-1.30.9'
+    api group: 'com.google.auth', name: 'google-auth-library-oauth2-http', version: '0.20.0'
 
 
     implementation 'com.electriccloud.plugins:flowpdf-groovy-lib:1.0.1.0'
