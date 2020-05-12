@@ -42,7 +42,7 @@ class DynamicDropdownHandlerTest extends SpecHelper {
         when:
         def families = handler.listFamilies(project)
         then:
-        if (project != projectl) {
+        if (project != project) {
             assert families.size() > 0
         }
         where:
