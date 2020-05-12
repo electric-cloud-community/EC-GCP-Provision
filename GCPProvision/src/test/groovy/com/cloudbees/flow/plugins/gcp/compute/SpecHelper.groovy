@@ -1,13 +1,25 @@
 package com.cloudbees.flow.plugins.gcp.compute
 
 import com.cloudbees.flow.plugins.gcp.compute.logger.Logger
+import groovy.json.JsonSlurper
 import spock.lang.Specification
 
 class SpecHelper extends Specification {
 
     String getKey() {
         def key = System.getenv('GCP_KEY')
-        assert key
+        if (!key) {
+            key = System.getenv('GCP_KEY_BASE64')
+            assert key
+            key = new String(key.decodeBase64())
+            key.trim()
+        }
+        try {
+            new JsonSlurper().parseText(key)
+        } catch(Throwable e) {
+            e.printStackTrace()
+            throw e
+        }
         return key
     }
 
