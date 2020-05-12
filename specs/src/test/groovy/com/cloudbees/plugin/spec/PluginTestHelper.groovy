@@ -40,9 +40,14 @@ class PluginTestHelper extends PluginSpockTestSupport {
     }
 
     String getKey() {
-        def token = System.getenv("GCP_KEY")
-        assert token
-        def parsed = new JsonSlurper().parseText(token)
+        def key = System.getenv("GCP_KEY")
+        if (!key) {
+            key = System.getenv('GCP_KEY_BASE64')
+            assert key
+            key = new String(key.decodeBase64())
+            key.trim()
+        }
+        def parsed = new JsonSlurper().parseText(key)
         JsonOutput.toJson(parsed).replaceAll(/\\n/, /\\\\n/)
     }
 
