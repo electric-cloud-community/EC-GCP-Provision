@@ -1,5 +1,6 @@
 plugins {
     id 'groovy'
+    id 'java-library'
 }
 
 group 'com.cloudbees.flow.plugins'
@@ -10,19 +11,20 @@ repositories {
     maven {
         url 'https://maven.google.com'
     }
-
+    flatDir {
+        dirs '../agent/deps/libs'
+    }
 }
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.11'
 
-    implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.30.5'
-    implementation group: 'com.google.apis', name: 'google-api-services-compute', version: '+'
-    implementation 'com.google.auth:google-auth-library-oauth2-http:0.19.0'
-
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-
+    api group: 'com.google.api-client', name: 'google-api-client', version: '1.30.9'
+    api group: 'com.google.apis', name: 'google-api-services-compute', version: 'v1-rev20200331-1.30.9'
+    api group: 'com.google.auth', name: 'google-auth-library-oauth2-http', version: '0.20.0'
+    implementation 'com.electriccloud.plugins:flowpdf-groovy-lib:1.0.1.0'
+    testImplementation 'com.electriccloud.plugins:flowpdf-groovy-lib:1.0.1.0'
+    testImplementation 'org.spockframework:spock-core:1.1-groovy-2.4'
 }
 
 
@@ -31,4 +33,11 @@ configurations.all {
         // TODO the line below is required for Detox since version 12.5; it should removed as soon as the project compiles without it
         force 'androidx.annotation:annotation:1.0.0'
     }
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+    outputs.upToDateWhen { false }
 }

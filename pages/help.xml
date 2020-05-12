@@ -14,7 +14,7 @@
     <h1>@PLUGIN_KEY@</h1>
     <p>Plugin version @PLUGIN_VERSION@</p>
     
-    <p>Revised on May 04, 2020</p>
+    <p>Revised on May 05, 2020</p>
     
     <hr style="margin-left: -10px; margin-top: 10px; height: 1px; width: 100%; color: #5981BD;" noshade="noshade"/>
     <h1>Contents</h1>
@@ -28,8 +28,6 @@
     
     
     
-    
-    <li><a href="#CreateConfiguration">Plugin Configuration</a></li>
     
 
     
@@ -93,108 +91,6 @@
     <!--TODO custom blocks-->
 
     
-    <div id="CreateConfiguration">
-        <a name='CreateConfiguration' id="CreateConfiguration"> </a>
-        <h1>Plugin Configurations</h1>
-
-        <p>
-            Plugin configurations are sets of parameters that apply
-            across some or all of the plugin procedures. They
-            reduce repetition of common values, create
-            predefined parameter sets for end users, and
-            securely store credentials where needed. Each configuration
-            is given a unique name that is entered in designated
-            parameters on procedures that use them.<br /><br />
-        </p>
-
-        <h3>Creating Plugin Configurations</h3>
-        <p>To create plugin configurations in CloudBees CD,
-            do these steps:</p>
-
-        <li>Go to <b>Administration</b> &gt; <b>Plugins</b> to open the Plugin Manager.</li>
-        <li>Find the @PLUGIN_NAME@ row.</li>
-        <li>Click <b>Configure</b> to open the
-             Configurations page.</li>
-        <li>Click <b>Create Configuration</b> as per the description of parameters below.</li>
-        
-
-        <h2>Configuration Procedure Parameters</h2>
-        <table class="grid">
-            <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            
-            <tr>
-                
-                    <td class="required">Configuration Name</td>
-                    <td>The name for the created configuration</td>
-                
-            </tr>
-            
-            <tr>
-                
-                    <td >Description</td>
-                    <td>Description for the configuration</td>
-                
-            </tr>
-            
-            <tr>
-                
-                    <td class="required">Project Id</td>
-                    <td>Project ID of the project in GCP under which Instances are provisioned.</td>
-                
-            </tr>
-            
-            <tr>
-                
-                    <td class="required">Zone</td>
-                    <td>Zone name, e.g. us-east1-b</td>
-                
-            </tr>
-            
-            <tr>
-                
-                    <td class="required">Credential</td>
-                    <td>Service account key in JSON format. For example,<br/><pre>
-{
-  &quot;type&quot;: &quot;service_account&quot;,
-  &quot;project_id&quot;: &quot;PROJECT ID&quot;,
-  &quot;private_key_id&quot;: &quot;PRIVATE KEY ID&quot;,
-  &quot;private_key&quot;: &quot;-----BEGIN PRIVATE KEY-----PRIVATE KEY CONTENT-----END PRIVATE KEY-----\n&quot;,
-  &quot;client_email&quot;: &quot;SERVICE ACCOUNT NAME@PROJECT ID.iam.gserviceaccount.com&quot;,
-  &quot;client_id&quot;: &quot;CLIENT ID&quot;,
-  &quot;auth_uri&quot;: &quot;https://accounts.google.com/o/oauth2/auth&quot;,
-  &quot;token_uri&quot;: &quot;https://oauth2.googleapis.com/token&quot;,
-  &quot;auth_provider_x509_cert_url&quot;: &quot;https://www.googleapis.com/oauth2/v1/certs&quot;,
-  &quot;client_x509_cert_url&quot;: &quot;https://www.googleapis.com/robot/v1/metadata/x509/ACCOUNT ID&quot;
-}
-</pre></td>
-                
-            </tr>
-            
-            <tr>
-                
-                    <td >Check Connection?</td>
-                    <td>If checked, the connection endpoint and credentials entered as part of the configuration will be tested. If this option is checked, configuration will not be saved if the test fails.</td>
-                
-            </tr>
-            
-            <tr>
-                
-                    <td >Debug Level</td>
-                    <td>This option sets debug level for logs. If info is selected, only summary information will be shown, for debug, there will be some debug information and for trace the whole requests and responses will be shown.</td>
-                
-            </tr>
-            
-            </tbody>
-        </table>
-        
-    </div>
-    
 
     
 
@@ -227,13 +123,6 @@
             
             <tr>
                 
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
-            
-            <tr>
-                
                 <td >Family</td>
                 <td>Name of the Image family.
 Either image family name or image name should be provided.
@@ -256,7 +145,12 @@ If the image name is not provided, it will be calculated from the family name.
                 
                 <td >Source</td>
                 <td>Source from which Image is created. It should be one of the following:
-<ul><li>Source Disk</li><li>Source Snapshot</li><li>Source Image</li></ul></td>
+<ul>
+<li>Source Disk</li>
+<li>Source Snapshot</li>
+<li>Source Image</li>
+</ul>
+</td>
                 
             </tr>
             
@@ -353,13 +247,6 @@ If Source Disk is chosen, this field should be specified.
             
             <tr>
                 
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
-            
-            <tr>
-                
                 <td class="required">Instance Names</td>
                 <td>Instance name.<br/>
 In case of multiple instances, specify one instance name per line.
@@ -418,13 +305,6 @@ In case of multiple instances, specify one instance name per line.
             </tr>
             </thead>
             <tbody>
-            
-            <tr>
-                
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
             
             <tr>
                 
@@ -516,7 +396,14 @@ Either the family or a URL should be provided.
                 
                 <td >Use Service Account</td>
                 <td>If specified, the Service Account used to provision the virtual machine.
-Options are as follows.<br/><br/><ul><li>None - No Service Account is used.</li><li>Same - Use the Service Account as in the plugin configuration.</li><li>Another - Use the Service account as specified in the Service Account email field. In this case the expectation is that the Service Account used in the plugin configuration has privileges to access this other service account.</li></ul></td>
+Options are as follows.<br/><br/>
+
+<ul>
+<li>None - No Service Account is used.</li>
+<li>Same - Use the Service Account as in the plugin configuration.</li>
+<li>Another - Use the Service account as specified in the Service Account email field. In this case the expectation is that the Service Account used in the plugin configuration has privileges to access this other service account.</li>
+</ul>
+</td>
                 
             </tr>
             
@@ -572,7 +459,7 @@ Options are as follows.<br/><br/><ul><li>None - No Service Account is used.</li>
             
             <tr>
                 
-                <td ></td>
+                <td >resourcePort</td>
                 <td>Agent port for the created resource.</td>
                 
             </tr>
@@ -641,13 +528,6 @@ Options are as follows.<br/><br/><ul><li>None - No Service Account is used.</li>
             </tr>
             </thead>
             <tbody>
-            
-            <tr>
-                
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
             
             <tr>
                 
@@ -733,23 +613,17 @@ Currently, only sorting by name or creationTimestamp desc is supported.
             
             <tr>
                 
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
-            
-            <tr>
-                
                 <td class="required">Script</td>
                 <td>Script to evaluate.
 This is an example:
 <pre>
-println &quot;Compute raw client: $compute&quot;
-println &quot;Project ID: $project&quot;
-println &quot;Zone: $zone&quot;
-println &quot;Flow Client: $ef&quot;
-println &quot;Compute Wrapper: $wrapper&quot;
-</pre></td>
+println "Compute raw client: $compute"
+println "Project ID: $project"
+println "Zone: $zone"
+println "Flow Client: $ef"
+println "Compute Wrapper: $wrapper"
+</pre>
+</td>
                 
             </tr>
             
@@ -799,13 +673,6 @@ println &quot;Compute Wrapper: $wrapper&quot;
             
             <tr>
                 
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
-            
-            <tr>
-                
                 <td class="required">Instance Names</td>
                 <td>Instance name.<br/>
 In case of multiple instances, specify one instance name per line.
@@ -848,14 +715,7 @@ In case of multiple instances, specify one instance name per line.
             
             <tr>
                 
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
-            
-            <tr>
-                
-                <td class="required"></td>
+                <td class="required">instanceNames</td>
                 <td>Instance name.<br/>
 In case of multiple instances, specify one instance name per line.
 </td>
@@ -887,13 +747,6 @@ In case of multiple instances, specify one instance name per line.
             </tr>
             </thead>
             <tbody>
-            
-            <tr>
-                
-                <td class="required">Configuration Name</td>
-                <td>Previously defined configuration for the plugin</td>
-                
-            </tr>
             
             <tr>
                 
