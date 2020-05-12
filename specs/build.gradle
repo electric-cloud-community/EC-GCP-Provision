@@ -39,7 +39,7 @@ dependencies {
         transitive = false // this avoids affecting your semver of Groovy/Spock
     }
 
-    compile project(':GCPProvision')
+    implementation project(':GCPProvision')
 
 }
 
