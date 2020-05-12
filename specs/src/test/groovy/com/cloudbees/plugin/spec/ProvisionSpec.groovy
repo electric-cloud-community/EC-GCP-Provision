@@ -1,6 +1,7 @@
 package com.cloudbees.plugin.spec
 
 import com.cloudbees.flow.plugins.gcp.compute.GCP
+import spock.lang.Ignore
 import spock.lang.Shared
 
 class ProvisionSpec extends PluginTestHelper {
@@ -16,7 +17,7 @@ class ProvisionSpec extends PluginTestHelper {
     @Shared
     def subnetwork = 'default'
     @Shared
-    GCP gcp
+    GCP gcp = buildGCP()
 
     def setupSpec() {
         switchAdmin()
@@ -50,9 +51,8 @@ class ProvisionSpec extends PluginTestHelper {
                             resultProperty      : '/myJob/result'
             ]]
         )
-
         switchUser()
-        gcp = buildGCP()
+
     }
 
     def cleanupSpec() {
@@ -95,10 +95,11 @@ class ProvisionSpec extends PluginTestHelper {
         assert gcp.getInstanceExternalIp(name)
         assert instance.getNetworkInterfaces().first().getNetwork() =~ /default/
         cleanup:
-        gcp.deleteInstance(name)
+        buildGCP().deleteInstance(name)
         deleteResource(name)
     }
 
+    @Ignore
     def 'provision instance with same service account'() {
         when:
         def result = runProcedure(projectName, procedureName,
@@ -112,7 +113,7 @@ class ProvisionSpec extends PluginTestHelper {
         def instance = gcp.getInstance(name)
         assert instance.getServiceAccounts().first().getEmail()
         cleanup:
-        gcp.deleteInstance(name)
+        buildGCP().deleteInstance(name)
     }
 
     def 'provision instance with keys'() {
